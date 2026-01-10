@@ -17,7 +17,6 @@ from cachetools import TTLCache
 from ....lib.circuit_breaker import (
     CircuitBreakerConfig,
     CircuitBreakerFactory,
-    get_circuit_breaker,
 )
 from ....lib.logger import get_logger
 from ....lib.prompt_sanitizer import escape_xml, sanitize_for_prompt
@@ -456,15 +455,13 @@ Return response in JSON format.
 
         # LLM 호출 (Circuit Breaker + LLM Factory)
         try:
-            # Circuit Breaker 가져오기 (DI Factory 우선, 없으면 deprecated 함수 사용)
+            # Circuit Breaker 가져오기 (DI Factory에서 주입)
             cb_config = CircuitBreakerConfig(
                 failure_threshold=3, timeout=30.0, error_rate_threshold=0.3
             )
-            if self.circuit_breaker_factory:
-                breaker = self.circuit_breaker_factory.get("llm_query_router", cb_config)
-            else:
-                # Deprecated 경로: v4.0.0에서 제거 예정
-                breaker = get_circuit_breaker("llm_query_router", cb_config)
+            if not self.circuit_breaker_factory:
+                raise ValueError("circuit_breaker_factory는 DI Container에서 주입되어야 합니다.")
+            breaker = self.circuit_breaker_factory.get("llm_query_router", cb_config)
 
             # LLM Factory 사용 (우선) 또는 직접 호출 (폴백)
             if self.llm_factory:

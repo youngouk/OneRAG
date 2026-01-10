@@ -404,56 +404,6 @@ class CircuitBreakerFactory:
 
 
 # ========================================
-# Global Registry (Deprecated)
-# ========================================
-
-
-_circuit_breakers: dict[str, CircuitBreaker] = {}
-
-
-def get_circuit_breaker(name: str, config: CircuitBreakerConfig | None = None) -> CircuitBreaker:
-    """
-    전역 Circuit Breaker 가져오기 (싱글톤)
-
-    .. deprecated:: 3.1.0
-        DI Container의 AppContainer.circuit_breaker_factory를 사용하세요.
-        이 함수는 하위 호환성을 위해 유지되며 v4.0.0에서 제거될 예정입니다.
-
-    Example (Deprecated):
-        cb = get_circuit_breaker('document_retrieval')
-
-    Example (Recommended):
-        from app.core.di_container import AppContainer
-
-        container = AppContainer()
-        factory = container.circuit_breaker_factory()
-        cb = factory.get('document_retrieval')
-    """
-    import warnings
-
-    warnings.warn(
-        "get_circuit_breaker()는 deprecated되었습니다. "
-        "DI Container의 AppContainer.circuit_breaker_factory를 사용하세요.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    if name not in _circuit_breakers:
-        _circuit_breakers[name] = CircuitBreaker(name, config)
-    return _circuit_breakers[name]
-
-
-def get_all_circuit_breakers() -> dict[str, dict[str, Any]]:
-    """모든 Circuit Breaker 상태 반환"""
-    return {name: breaker.get_state() for name, breaker in _circuit_breakers.items()}
-
-
-async def reset_all_circuit_breakers() -> None:
-    """모든 Circuit Breaker 리셋"""
-    for breaker in _circuit_breakers.values():
-        await breaker.reset()
-
-
-# ========================================
 # NoopCircuitBreaker (MVP용)
 # ========================================
 
