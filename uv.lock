@@ -4270,7 +4270,7 @@ wheels = [
 
 [[package]]
 name = "rag-chatbot"
-version = "3.0.0"
+version = "1.0.7"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },

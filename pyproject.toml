@@ -1,6 +1,6 @@
 [project]
 name = "rag-chatbot"
-version = "1.0.5"
+version = "1.0.7"
 description = "Enhanced 한국어 RAG 챗봇 시스템 - 시멘틱 청킹, 동적 임계값, GPT-5 쿼리 확장 지원"
 readme = "README.md"
 requires-python = ">=3.11"

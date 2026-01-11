@@ -4,6 +4,52 @@
 
 ---
 
+## [v1.0.7] - 2026-01-10
+
+### Changed
+- **Phase 3**: `get_performance_metrics()` → `_get_performance_metrics()` 리팩토링 (TDD 기반)
+  - deprecated 공개 함수를 private 내부 헬퍼로 전환
+  - DeprecationWarning 제거 (모듈 내부용이므로 불필요)
+  - `track_function_performance` 데코레이터 내부 호출 업데이트
+  - 전역 metrics 객체 초기화 업데이트
+  - 7개 테스트 추가 (`tests/unit/lib/test_metrics_internal.py`)
+- 전체 테스트 1,295개로 증가 (+7개 신규)
+
+### Documentation
+- CLAUDE.md v1.0.7 동기화
+- TECHNICAL_DEBT_ANALYSIS.md 업데이트
+
+---
+
+## [v1.0.6] - 2026-01-10
+
+### Changed
+- **Phase 1**: deprecated 함수 제거 (-48줄)
+  - `get_prompt_manager()` 완전 제거
+  - `GPT5NanoReranker` 클래스 제거 → `OpenAILLMReranker` 사용
+- **Phase 2**: 전역 레지스트리 제거 (-57줄)
+  - `get_circuit_breaker()` 함수 제거
+  - `_circuit_breakers` 전역 레지스트리 제거
+  - `LLMQueryRouter`에 `circuit_breaker_factory` 필수화
+- DI Container 필수화로 모든 deprecated 함수 제거
+
+---
+
+## [v1.0.5] - 2026-01-09
+
+### Added
+- **Multi Vector DB 6종 지원**
+  - `VectorStoreFactory`: 벡터 DB 동적 선택 팩토리
+  - `RetrieverFactory`: Retriever 동적 선택 팩토리
+  - 지원 DB: Weaviate (기본), Chroma, Pinecone, Qdrant, pgvector, MongoDB Atlas
+  - 환경변수 `VECTOR_DB_PROVIDER`로 DB 선택
+
+### Changed
+- pyproject.toml에 선택적 의존성 추가 (`chroma`, `pinecone`, `qdrant`, `pgvector`, `all-vectordb`)
+- DI Container에 VectorStore, Retriever Factory Provider 추가
+
+---
+
 ## [v3.3.1] - 2026-01-08
 
 ### Security
@@ -268,4 +314,4 @@
 ---
 
 **관리자**: Claude Code
-**마지막 업데이트**: 2026-01-05
+**마지막 업데이트**: 2026-01-11
