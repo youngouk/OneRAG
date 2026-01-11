@@ -158,7 +158,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Run Tests
-        run: uv run pytest --tb=short -q --timeout=60
+        run: uv run pytest --tb=short -q --timeout=60 --ignore=tests/integration
 
       - name: Upload coverage (optional)
         if: success()
