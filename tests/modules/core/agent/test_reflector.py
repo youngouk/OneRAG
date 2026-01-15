@@ -5,11 +5,12 @@ Self-Reflection 기능의 핵심 로직 검증:
 - 초기화 및 의존성 검증
 - reflect() 메서드 동작 검증
 """
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from app.modules.core.agent.reflector import AgentReflector
+import pytest
+
 from app.modules.core.agent.interfaces import AgentConfig, ReflectionResult
+from app.modules.core.agent.reflector import AgentReflector
 
 
 class TestAgentReflectorInit:

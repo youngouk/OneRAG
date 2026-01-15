@@ -6,11 +6,11 @@ Self-Reflection E2E 통합 테스트
 - Reflection 활성화 시 품질 평가 및 개선 흐름
 - Reflection 비활성화 시 건너뜀
 """
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
 from app.modules.core.agent.factory import AgentFactory
-from app.modules.core.agent.interfaces import AgentConfig
 
 
 class TestSelfReflectionE2E:

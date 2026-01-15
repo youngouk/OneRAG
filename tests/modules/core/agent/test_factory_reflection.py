@@ -6,11 +6,11 @@ AgentFactory가 Reflector를 올바르게 생성하고 Orchestrator에 주입하
 - Reflection 비활성화 시 Reflector 미생성
 - YAML 설정에서 Reflection 옵션 로드
 """
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from app.modules.core.agent.factory import AgentFactory, DEFAULT_AGENT_CONFIG
-from app.modules.core.agent.interfaces import AgentConfig
+import pytest
+
+from app.modules.core.agent.factory import AgentFactory
 
 
 class TestAgentFactoryReflection:

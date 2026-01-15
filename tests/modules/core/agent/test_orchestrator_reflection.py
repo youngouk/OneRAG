@@ -6,14 +6,15 @@ Self-Reflection 루프가 Orchestrator에 올바르게 통합되었는지 검증
 - 점수 기반 재시도 로직
 - 최대 반복 횟수 제한
 """
-import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
-from app.modules.core.agent.orchestrator import AgentOrchestrator
+import pytest
+
 from app.modules.core.agent.interfaces import (
     AgentConfig,
     ReflectionResult,
 )
+from app.modules.core.agent.orchestrator import AgentOrchestrator
 
 
 class TestOrchestratorReflection:

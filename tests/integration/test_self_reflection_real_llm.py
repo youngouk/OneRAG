@@ -15,13 +15,12 @@ Self-Reflection 실제 LLM 통합 테스트
 """
 
 import os
+
 import pytest
 
-from app.lib.llm_client import LLMClientFactory, OpenAILLMClient
-from app.modules.core.agent.factory import AgentFactory
+from app.lib.llm_client import OpenAILLMClient
 from app.modules.core.agent.interfaces import AgentConfig
 from app.modules.core.agent.reflector import AgentReflector
-
 
 # API 키 존재 여부 확인
 HAS_OPENAI_KEY = bool(os.getenv("OPENAI_API_KEY"))
@@ -297,7 +296,7 @@ class TestSelfReflectionRealLLM:
         assert isinstance(result.score, float)
         assert 0.0 <= result.score <= 10.0
 
-        print(f"\n[한국어 테스트 결과]")
+        print("\n[한국어 테스트 결과]")
         print(f"점수: {result.score}")
         print(f"개선필요: {result.needs_improvement}")
         print(f"문제점: {result.issues}")
@@ -372,7 +371,7 @@ class TestSelfReflectionRealLLM:
         )
 
         # Then: 점수는 비슷하지만 needs_improvement는 다를 수 있음
-        print(f"\n[Threshold 경계값 테스트]")
+        print("\n[Threshold 경계값 테스트]")
         print(f"낮은 threshold(5.0): 점수={low_result.score}, 개선필요={low_result.needs_improvement}")
         print(f"높은 threshold(9.0): 점수={high_result.score}, 개선필요={high_result.needs_improvement}")
 
