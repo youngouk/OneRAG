@@ -365,15 +365,45 @@ class OpenAILLMClient(BaseLLMClient):
         self, prompt: str, system_prompt: str | None = None, **kwargs: Any
     ) -> AsyncGenerator[str, None]:
         """
-        OpenAI 스트리밍 텍스트 생성 (향후 구현 예정)
+        OpenAI 스트리밍 텍스트 생성
 
-        현재는 NotImplementedError를 발생시킵니다.
+        stream=True 옵션을 사용하여 응답을 청크 단위로 yield합니다.
+
+        Args:
+            prompt: 사용자 프롬프트
+            system_prompt: 시스템 프롬프트 (선택적)
+            **kwargs: 추가 파라미터
+
+        Yields:
+            str: 생성된 텍스트 청크
         """
-        raise NotImplementedError(
-            "OpenAILLMClient.stream_text()는 아직 구현되지 않았습니다. "
-            "GoogleLLMClient를 사용하거나 향후 업데이트를 기다려주세요."
-        )
-        yield  # AsyncGenerator 타입 힌트를 위해 필요
+        try:
+            messages: list[dict[str, str]] = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": prompt})
+
+            # stream=True로 스트리밍 응답 요청
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,  # type: ignore[arg-type]
+                temperature=self.temperature,
+                max_tokens=self.max_tokens,
+                stream=True,
+            )
+
+            # 청크 단위로 yield (빈 콘텐츠는 건너뜀)
+            for chunk in response:  # type: ignore[union-attr]
+                if chunk.choices and chunk.choices[0].delta.content:  # type: ignore[union-attr]
+                    yield chunk.choices[0].delta.content  # type: ignore[union-attr]
+
+        except Exception as e:
+            logger.error(
+                "OpenAI LLM 스트리밍 실패",
+                extra={"error": str(e), "error_type": type(e).__name__},
+                exc_info=True,
+            )
+            raise
 
 
 class AnthropicLLMClient(BaseLLMClient):
@@ -417,15 +447,39 @@ class AnthropicLLMClient(BaseLLMClient):
         self, prompt: str, system_prompt: str | None = None, **kwargs: Any
     ) -> AsyncGenerator[str, None]:
         """
-        Anthropic 스트리밍 텍스트 생성 (향후 구현 예정)
+        Anthropic 스트리밍 텍스트 생성
 
-        현재는 NotImplementedError를 발생시킵니다.
+        messages.stream() API를 사용하여 응답을 청크 단위로 yield합니다.
+        content_block_delta 이벤트만 처리하여 텍스트를 추출합니다.
+
+        Args:
+            prompt: 사용자 프롬프트
+            system_prompt: 시스템 프롬프트 (선택적)
+            **kwargs: 추가 파라미터
+
+        Yields:
+            str: 생성된 텍스트 청크
         """
-        raise NotImplementedError(
-            "AnthropicLLMClient.stream_text()는 아직 구현되지 않았습니다. "
-            "GoogleLLMClient를 사용하거나 향후 업데이트를 기다려주세요."
-        )
-        yield  # AsyncGenerator 타입 힌트를 위해 필요
+        try:
+            # Anthropic 스트리밍 API 사용 (with 문으로 리소스 관리)
+            with self.client.messages.stream(
+                model=self.model,
+                max_tokens=self.max_tokens,
+                system=system_prompt if system_prompt else "",
+                messages=[{"role": "user", "content": prompt}],
+            ) as stream:
+                # content_block_delta 이벤트만 처리
+                for event in stream:
+                    if event.type == "content_block_delta":
+                        yield event.delta.text  # type: ignore[union-attr]
+
+        except Exception as e:
+            logger.error(
+                "Anthropic LLM 스트리밍 실패",
+                extra={"error": str(e), "error_type": type(e).__name__},
+                exc_info=True,
+            )
+            raise
 
 
 class OpenRouterLLMClient(BaseLLMClient):
