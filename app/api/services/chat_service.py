@@ -12,6 +12,9 @@ Phase 3.2: chat.py에서 추출한 검증된 비즈니스 로직
 - RAG 파이프라인, 세션 처리, 통계 관리 등 핵심 기능 제공
 """
 
+import time
+import uuid
+from collections.abc import AsyncGenerator
 from datetime import datetime
 from typing import Any
 
@@ -339,3 +342,209 @@ class ChatService:
             "model_info": latest_model_info,
             "timestamp": datetime.now().isoformat(),
         }
+
+    async def stream_rag_pipeline(
+        self, message: str, session_id: str | None, options: dict[str, Any] | None = None
+    ) -> AsyncGenerator[dict[str, Any], None]:
+        """
+        스트리밍 RAG 파이프라인 실행
+
+        세션 처리, 컨텍스트 준비, 문서 검색, 리랭킹은 비스트리밍으로 처리하고,
+        답변 생성 단계에서만 스트리밍으로 청크를 yield합니다.
+
+        이벤트 타입:
+        - metadata: 검색 결과 메타데이터 (세션 ID, 문서 수, 소스 등)
+        - chunk: LLM 응답 텍스트 청크 (data, chunk_index)
+        - done: 스트리밍 완료 이벤트 (session_id, total_chunks)
+        - error: 에러 이벤트 (error_code, message)
+
+        Args:
+            message: 사용자 메시지
+            session_id: 세션 ID (None이면 새로 생성)
+            options: 추가 옵션 (temperature, max_tokens, model 등)
+
+        Yields:
+            dict: 스트리밍 이벤트 딕셔너리
+
+        Example:
+            async for event in chat_service.stream_rag_pipeline(message, session_id):
+                if event["event"] == "chunk":
+                    print(event["data"], end="", flush=True)
+        """
+        options = options or {}
+        start_time = time.time()
+        chunk_index = 0
+        final_session_id = session_id
+
+        try:
+            # 1. 세션 처리 (비스트리밍)
+            session_module = self.modules.get("session")
+
+            if session_module:
+                if session_id:
+                    # 기존 세션 검증
+                    session_result = await session_module.get_session(session_id, {})
+                    if not session_result.get("is_valid"):
+                        # 세션이 유효하지 않으면 새로 생성
+                        new_session = await session_module.create_session(
+                            {"metadata": {}}, session_id=session_id
+                        )
+                        final_session_id = new_session["session_id"]
+                        logger.debug(f"스트리밍: 새 세션 생성 - {final_session_id}")
+                else:
+                    # 세션 ID 없으면 새로 생성
+                    new_session = await session_module.create_session({"metadata": {}})
+                    final_session_id = new_session["session_id"]
+                    logger.debug(f"스트리밍: 새 세션 생성 - {final_session_id}")
+
+                # 2. 세션 컨텍스트 조회 (비스트리밍)
+                session_context = await session_module.get_context_string(final_session_id)
+            else:
+                session_context = ""
+                if not final_session_id:
+                    final_session_id = str(uuid.uuid4())
+
+            # 3. 문서 검색 (비스트리밍)
+            retrieval_module = self.modules.get("retrieval")
+            search_results = []
+
+            if retrieval_module:
+                try:
+                    search_results = await retrieval_module.search(message, {
+                        "limit": options.get("limit", 8),
+                        "min_score": options.get("min_score", 0.05),
+                    })
+                    logger.debug(f"스트리밍: 검색 완료 - {len(search_results)}개 문서")
+                except Exception as e:
+                    logger.warning(f"스트리밍: 검색 실패 - {e}")
+
+            # 4. 리랭킹 (비스트리밍)
+            reranked_documents = search_results  # 기본값: 원본 검색 결과
+            reranking_applied = False
+
+            if search_results:
+                reranking_config = self.config.get("reranking", {})
+                retrieval_config = self.config.get("retrieval", {})
+                reranking_enabled = reranking_config.get("enabled", False) or retrieval_config.get(
+                    "enable_reranking", False
+                )
+
+                if reranking_enabled:
+                    retrieval_module = self.modules.get("retrieval")
+                    if retrieval_module and hasattr(retrieval_module, "rerank"):
+                        try:
+                            rerank_top_n = options.get("top_n", reranking_config.get("top_n", 8))
+                            reranked_documents = await retrieval_module.rerank(
+                                query=message,
+                                results=search_results,
+                                top_n=rerank_top_n,
+                            )
+
+                            # min_score 필터링
+                            min_score = reranking_config.get("min_score", 0.05)
+                            if min_score > 0:
+                                reranked_documents = [
+                                    doc
+                                    for doc in reranked_documents
+                                    if (hasattr(doc, "score") and doc.score >= min_score)
+                                    or (hasattr(doc, "metadata") and doc.metadata.get("score", 0) >= min_score)
+                                ]
+
+                            reranking_applied = True
+                            logger.debug(
+                                f"스트리밍: 리랭킹 완료 - {len(reranked_documents)}개 문서"
+                            )
+                        except Exception as e:
+                            logger.warning(f"스트리밍: 리랭킹 실패, 원본 사용 - {e}")
+                            reranked_documents = search_results
+                    else:
+                        logger.debug("스트리밍: 리랭킹 모듈 없음, 원본 사용")
+                else:
+                    logger.debug("스트리밍: 리랭킹 비활성화, 원본 사용")
+
+            # 5. 메타데이터 이벤트 전송
+            metadata_event = {
+                "event": "metadata",
+                "data": {
+                    "session_id": final_session_id,
+                    "search_results": len(search_results),
+                    "ranked_results": len(reranked_documents),
+                    "reranking_applied": reranking_applied,
+                    "message_id": str(uuid.uuid4()),
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
+            yield metadata_event
+
+            # 6. 스트리밍 답변 생성
+            generation_module = self.modules.get("generation")
+
+            if generation_module and hasattr(generation_module, "stream_answer"):
+                # 컨텍스트 문서 준비 (리랭킹된 문서 사용)
+                context_documents = reranked_documents if reranked_documents else []
+
+                # 생성 옵션 구성
+                generation_options = {
+                    **options,
+                    "session_context": session_context,
+                }
+
+                # 스트리밍 호출
+                try:
+                    async for text_chunk in generation_module.stream_answer(
+                        query=message,
+                        context_documents=context_documents,
+                        options=generation_options,
+                    ):
+                        chunk_event = {
+                            "event": "chunk",
+                            "data": text_chunk,
+                            "chunk_index": chunk_index,
+                        }
+                        yield chunk_event
+                        chunk_index += 1
+
+                except Exception as e:
+                    logger.error(f"스트리밍 답변 생성 실패: {e}", exc_info=True)
+                    yield {
+                        "event": "error",
+                        "error_code": ErrorCode.GENERATION_REQUEST_FAILED.value,
+                        "message": f"답변 생성 중 오류가 발생했습니다: {str(e)}",
+                    }
+                    return
+            else:
+                # 생성 모듈이 없거나 스트리밍을 지원하지 않는 경우
+                logger.warning("스트리밍: 생성 모듈 없음 또는 스트리밍 미지원")
+                yield {
+                    "event": "chunk",
+                    "data": "답변을 생성할 수 없습니다.",
+                    "chunk_index": 0,
+                }
+                chunk_index = 1
+
+            # 7. 완료 이벤트 전송
+            processing_time = time.time() - start_time
+            done_event = {
+                "event": "done",
+                "data": {
+                    "session_id": final_session_id,
+                    "total_chunks": chunk_index,
+                    "processing_time": processing_time,
+                    "tokens_used": 0,  # 스트리밍에서는 정확한 토큰 계산 어려움
+                },
+            }
+            yield done_event
+
+            logger.info(
+                f"스트리밍 완료: session_id={final_session_id}, "
+                f"chunks={chunk_index}, time={processing_time:.2f}s"
+            )
+
+        except Exception as e:
+            # 에러 이벤트 전송
+            logger.error(f"스트리밍 파이프라인 에러: {e}", exc_info=True)
+            yield {
+                "event": "error",
+                "error_code": ErrorCode.INTERNAL_ERROR.value if hasattr(ErrorCode, "INTERNAL_ERROR") else "GEN-999",
+                "message": f"스트리밍 처리 중 오류가 발생했습니다: {str(e)}",
+            }
