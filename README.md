@@ -1,4 +1,4 @@
-# RAG_Standard (v1.0.7 - 기술부채 Zero 완성)
+# RAG_Standard (v1.0.7)
 
 **한국어** | [English](README_EN.md)
 
@@ -8,12 +8,12 @@
 
 범용 RAG(Retrieval-Augmented Generation) 챗봇 백엔드 시스템. FastAPI 기반의 고성능 비동기 웹 서비스로, 엔터프라이즈급 보안과 최신 GraphRAG 기술이 통합된 **2026년 기준 무결점(Clean Code) 표준 모델**입니다.
 
-## 🏆 프로젝트 상태: "기술부채 Zero (v1.0.7)"
+## 🏆 프로젝트 상태 (v1.0.7)
 
-본 프로젝트는 단순한 구현을 넘어, 상용화 수준의 품질과 안정성을 확보한 **기술부채 Zero** 상태를 달성했습니다.
+본 프로젝트는 단순한 구현을 넘어, 상용화 수준의 품질과 안정성을 확보했습니다.
 
 - **테스트 무결성**: 총 **1,295개**의 단위/통합/장애 시나리오 테스트 100% 통과 (Pass)
-- **기술 부채 Zero**: 모든 deprecated 함수 제거, DI 패턴 완성, 80+ Provider 구조화
+- **코드 정리 완료**: 모든 deprecated 함수 제거, DI 패턴 완성, 80+ Provider 구조화
 - **정적 분석 100%**: `Ruff` (Lint) 및 `Mypy` (Strict Type Check) 표준 완벽 준수
 - **보안 완비**: 통합 PII 마스킹 시스템 및 모든 관리자 API 전역 인증(API Key) 강제화
 - **Multi Vector DB**: 6종 벡터 DB 지원 (Weaviate, Chroma, Pinecone, Qdrant, pgvector, MongoDB)

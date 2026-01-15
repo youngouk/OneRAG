@@ -1,4 +1,4 @@
-# RAG_Standard (v1.0.7 - Zero Technical Debt)
+# RAG_Standard (v1.0.7)
 
 [한국어](README.md) | **English**
 
@@ -8,12 +8,12 @@
 
 A production-ready RAG (Retrieval-Augmented Generation) chatbot backend system. High-performance async web service built with FastAPI, featuring enterprise-grade security and cutting-edge GraphRAG technology.
 
-## 🏆 Project Status: Zero Technical Debt
+## 🏆 Project Status (v1.0.7)
 
-This project has achieved **production-grade quality** with zero technical debt:
+This project has achieved **production-grade quality**:
 
 - **Test Coverage**: 1,295 unit/integration/failure scenario tests - 100% passing
-- **Zero Tech Debt**: All deprecated functions removed, DI pattern complete, 80+ providers structured
+- **Clean Codebase**: All deprecated functions removed, DI pattern complete, 80+ providers structured
 - **Static Analysis**: Full compliance with `Ruff` (Lint) and `Mypy` (Strict Type Check)
 - **Security**: Unified PII masking system with API Key authentication on all admin endpoints
 - **Multi Vector DB**: 6 vector databases supported (Weaviate, Chroma, Pinecone, Qdrant, pgvector, MongoDB)

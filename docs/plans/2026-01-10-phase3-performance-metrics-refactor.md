@@ -2,7 +2,7 @@
 
 > **작성일**: 2026-01-10
 > **예상 작업량**: 약 30분
-> **목표**: deprecated 함수를 private 함수로 변환하여 기술부채 Zero 완성
+> **목표**: deprecated 함수를 private 함수로 변환하여 코드 정리 완료
 
 ## 개요
 
@@ -369,5 +369,5 @@ EOF
 ✅ tests/unit/lib/test_metrics_internal.py - 신규 테스트 추가
 ✅ docs/TECHNICAL_DEBT_ANALYSIS.md - v1.0.7 업데이트
 ✅ 전체 테스트 통과 (1,288개 + 신규)
-✅ 기술부채 Zero 상태 유지
+✅ 코드 정리 상태 유지
 ```
