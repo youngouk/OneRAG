@@ -18,8 +18,8 @@ Phase 2 구현 (2025-11-28):
 import asyncio
 import os
 import time
-from dataclasses import dataclass
 from collections.abc import AsyncGenerator
+from dataclasses import dataclass
 from typing import Any, TypedDict, cast
 
 import httpx
@@ -613,6 +613,14 @@ class GenerationModule:
                 print(chunk, end="", flush=True)
         """
         options = options or {}
+        start_time = time.time()
+
+        # Issue 1 수정: 프롬프트 인젝션 검사 (generate_answer()와 일관성 유지)
+        sanitized_query, is_safe = sanitize_for_prompt(query, max_length=2000, check_injection=True)
+        if not is_safe:
+            logger.error(f"🚫 스트리밍 생성기에서 인젝션 차단: {query[:100]}")
+            yield "보안 정책에 따라 해당 요청을 처리할 수 없습니다."
+            return
 
         # 클라이언트 초기화 확인
         if not self.client:
@@ -671,12 +679,17 @@ class GenerationModule:
         # 스트리밍 API 호출
         stream = self.client.chat.completions.create(**api_params)
 
+        # Issue 2 수정: 통계 추적을 위한 청크 카운트 초기화
+        chunk_count = 0
+        self.stats["total_generations"] += 1
+
         # 청크 단위로 yield
         async for chunk in stream:
             if chunk.choices and len(chunk.choices) > 0:
                 delta = chunk.choices[0].delta
                 if hasattr(delta, "content") and delta.content:
                     content = delta.content
+                    chunk_count += 1  # 청크 카운트 증가
 
                     # Phase 2: 개인정보 마스킹 적용 (청크 단위)
                     if self._privacy_enabled and self.privacy_masker is not None:
@@ -687,6 +700,16 @@ class GenerationModule:
                             logger.warning(f"스트리밍 마스킹 실패: {e}")
 
                     yield content
+
+        # Issue 2 수정: 스트리밍 완료 후 통계 업데이트
+        generation_time = time.time() - start_time
+        # 청크당 평균 5토큰으로 추정 (스트리밍에서는 정확한 토큰 수 계산 불가)
+        estimated_tokens = chunk_count * 5
+        self._update_stats(model, estimated_tokens, generation_time)
+        logger.debug(
+            f"✅ 스트리밍 완료 (model={model}, chunks={chunk_count}, "
+            f"estimated_tokens={estimated_tokens}, time={generation_time:.2f}s)"
+        )
 
     # ========================================
     # 유틸리티 메서드
