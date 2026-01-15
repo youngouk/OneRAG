@@ -5,8 +5,9 @@ TDD 방식으로 stream_answer 메서드 구현을 위한 테스트.
 기존 generate_answer()와 유사하지만, 청크 단위로 응답을 yield하는 방식.
 """
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 
 class TestGenerationModuleStreaming:

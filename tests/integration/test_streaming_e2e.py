@@ -21,14 +21,13 @@ import json
 import os
 from collections.abc import AsyncGenerator
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 # main.py에서 FastAPI 앱 임포트
-from main import app
 
 
 def parse_sse_events(response_text: str) -> list[dict[str, Any]]:
@@ -148,6 +147,7 @@ class TestStreamingAPIWithMock:
         """Mock ChatService가 주입된 TestClient"""
         # 인증 미들웨어를 우회하기 위해 라우터만 포함한 앱 사용
         from fastapi import FastAPI
+
         from app.api.routers.chat_router import router, set_chat_service
 
         set_chat_service(mock_chat_service)
@@ -338,6 +338,7 @@ class TestStreamingInputValidation:
     def validation_app(self):
         """입력 검증 테스트용 앱 (인증 미들웨어 없음)"""
         from fastapi import FastAPI
+
         from app.api.routers.chat_router import router, set_chat_service
 
         # Mock 서비스 설정 (검증 통과 후 실행되지 않음)
@@ -450,6 +451,7 @@ class TestStreamingErrorHandling:
         """에러 Mock이 주입된 TestClient"""
         # 인증 미들웨어를 우회하기 위해 라우터만 포함한 앱 사용
         from fastapi import FastAPI
+
         from app.api.routers.chat_router import router, set_chat_service
 
         set_chat_service(mock_error_chat_service)
@@ -514,6 +516,7 @@ class TestStreamingServiceNotInitialized:
         """
         # 인증 미들웨어를 우회하기 위해 라우터만 포함한 앱 사용
         from fastapi import FastAPI
+
         from app.api.routers.chat_router import router, set_chat_service
 
         # chat_service를 None으로 설정
