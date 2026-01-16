@@ -1,0 +1,17 @@
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+# 시작 명령어: entrypoint.sh는 다음 작업을 수행
+# 1. runtime config.js 생성 (window.RUNTIME_CONFIG 설정)
+# 2. nginx.conf 템플릿에서 PORT 환경변수 치환
+# 3. nginx 서버 시작 (정적 파일 서빙)
+start = "/entrypoint.sh"
+
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+
+[env]
+NODE_ENV = "production"

@@ -1,0 +1,183 @@
+
+> frontend@0.0.0 test
+> vitest --run --reporter=verbose
+
+
+[1m[46m RUN [49m[22m [36mv4.0.8 [39m[90m/Users/youngouksong/Desktop/youngouk/moduleRagChat_Front[39m
+
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatSourcePreview[2m > [22mshould return default message if text is empty[32m 4[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatSourcePreview[2m > [22mshould truncate long text and add ellipsis[32m 4[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatSourcePreview[2m > [22mshould clean up table artifacts for preview[32m 13[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatSourcePreview[2m > [22mshould not truncate if text is shorter than limit[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatFullContent[2m > [22mshould return error message if content is empty[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatFullContent[2m > [22mshould format text and preserve distinct table structures[32m 2[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatModelConfigValue[2m > [22mshould format null[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatModelConfigValue[2m > [22mshould format primitives (string, number, boolean)[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatModelConfigValue[2m > [22mshould format arrays[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatModelConfigValue[2m > [22mshould format objects to JSON[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatTimestamp[2m > [22mshould format valid ISO string to time string[32m 19[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/formatters.test.ts[2m > [22mformatters[2m > [22mformatTimestamp[2m > [22mshould handle different time strings[32m 0[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould initialize with default states[32m 12[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould toggle dev tools based on screen size[32m 6[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould handle chunk modal open/close[32m 6[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould toggle log expansion[32m 11[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould copy text to clipboard successfully[32m 6[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould handle clipboard error[32m 1[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould trigger scroll to bottom when messages change[32m 2[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatInteraction.test.ts[2m > [22museChatInteraction[2m > [22mshould set initial devtools state based on window width[32m 7[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatSession.test.ts[2m > [22museChatSession[2m > [22mshould initialize a new session if no session ID exists in localStorage[32m 65[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatSession.test.ts[2m > [22museChatSession[2m > [22mshould restore an existing session from localStorage[32m 6[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatSession.test.ts[2m > [22museChatSession[2m > [22mshould handle session restoration failure by creating a new session[32m 11[2mms[22m[39m
+[90mstderr[2m | src/hooks/chat/__tests__/useChatMessages.test.ts[2m > [22m[2museChatMessages[2m > [22m[2mshould update input state
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/hooks/chat/__tests__/useChatMessages.test.ts[2m > [22museChatMessages[2m > [22mshould initialize with empty messages and input[32m 25[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatMessages.test.ts[2m > [22museChatMessages[2m > [22mshould update input state[32m 20[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatMessages.test.ts[2m > [22museChatMessages[2m > [22mshould handle sending a message successfully[32m 21[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatMessages.test.ts[2m > [22museChatMessages[2m > [22mshould handle send message failure[32m 4[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatMessages.test.ts[2m > [22museChatMessages[2m > [22mshould prevent sending empty messages or when loading[32m 7[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatSession.test.ts[2m > [22museChatSession[2m > [22mshould start a new session when handleNewSession is called[32m 64[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatSession.test.ts[2m > [22museChatSession[2m > [22mshould create a fallback session if backend is down during initialization[32m 55[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeHTML[2m > [22m허용된 HTML 태그를 유지해야 함[32m 48[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeHTML[2m > [22m위험한 스크립트 태그를 제거해야 함[32m 2[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeHTML[2m > [22m이벤트 핸들러를 제거해야 함[32m 2[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeText[2m > [22m모든 HTML 태그를 제거해야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeText[2m > [22m스크립트를 완전히 제거해야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeURL[2m > [22mHTTPS URL을 허용해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeURL[2m > [22mHTTP URL을 허용해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeURL[2m > [22mjavascript: 프로토콜을 차단해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeURL[2m > [22mdata: 프로토콜을 차단해야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/__tests__/sanitize.test.ts[2m > [22msanitize utilities[2m > [22msanitizeURL[2m > [22m잘못된 URL을 빈 문자열로 반환해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatDevTools.test.ts[2m > [22museChatDevTools[2m > [22mshould initialize with default values[32m 15[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatDevTools.test.ts[2m > [22museChatDevTools[2m > [22mshould toggle log expansion[32m 6[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatDevTools.test.ts[2m > [22museChatDevTools[2m > [22mshould clear logs[32m 2[2mms[22m[39m
+ [32m✓[39m src/hooks/chat/__tests__/useChatDevTools.test.ts[2m > [22museChatDevTools[2m > [22mshould update tab state[32m 1[2mms[22m[39m
+[90mstdout[2m | src/components/chat/__tests__/ChatTab.test.tsx
+[22m[39m개발 모드: 직접 백엔드 URL 사용: https://wed-rag-backend-production.up.railway.app
+API Configuration: {
+  baseURL: [32m'https://wed-rag-backend-production.up.railway.app'[39m,
+  environment: [32m'test'[39m,
+  isDev: [33mtrue[39m,
+  isProd: [33mfalse[39m
+}
+
+[90mstdout[2m | src/components/chat/__tests__/ChatTab.test.tsx
+[22m[39m🚀 ChatWebSocketService 초기화
+
+[90mstderr[2m | src/hooks/__tests__/useOfflineDetection.test.ts[2m > [22m[2museOfflineDetection[2m > [22m[2m오프라인 이벤트 시 콜백을 호출해야 함
+[22m[39m⚠️ 네트워크 연결 끊김
+
+[90mstdout[2m | src/hooks/__tests__/useOfflineDetection.test.ts[2m > [22m[2museOfflineDetection[2m > [22m[2m온라인 이벤트 시 콜백을 호출해야 함
+[22m[39m✅ 네트워크 연결 복구
+
+ [32m✓[39m src/hooks/__tests__/useOfflineDetection.test.ts[2m > [22museOfflineDetection[2m > [22m초기 온라인 상태를 올바르게 반환해야 함[32m 24[2mms[22m[39m
+ [32m✓[39m src/hooks/__tests__/useOfflineDetection.test.ts[2m > [22museOfflineDetection[2m > [22m오프라인 이벤트 시 콜백을 호출해야 함[32m 12[2mms[22m[39m
+ [32m✓[39m src/hooks/__tests__/useOfflineDetection.test.ts[2m > [22museOfflineDetection[2m > [22m온라인 이벤트 시 콜백을 호출해야 함[32m 11[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould return original text if it contains no HTML tags[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould return empty string if input is empty[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould strip style, class, id, and data- attributes[32m 6[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould format tables correctly[32m 13[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould convert block elements to newlines[32m 30[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould format bold and italic text[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould handle nested structures gracefully[32m 2[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/htmlParser.test.ts[2m > [22mhtmlParser[2m > [22mparseHtmlContent[2m > [22mshould clean up excessive newlines and spaces[32m 3[2mms[22m[39m
+[90mstderr[2m | src/utils/privacy.test.ts[2m > [22m[2mmaskPhoneNumber - Edge Case 테스트[2m > [22m[2m문자열이 아닌 타입을 안전하게 처리해야 함
+[22m[39m[privacy] maskPhoneNumber: 입력값이 문자열이 아닙니다. number
+[privacy] maskPhoneNumber: 입력값이 문자열이 아닙니다. object
+[privacy] maskPhoneNumber: 입력값이 문자열이 아닙니다. object
+
+[90mstdout[2m | src/utils/privacy.test.ts[2m > [22m[2mmaskPhoneNumber - 성능 테스트[2m > [22m[2m단일 메시지 처리는 1ms 이하여야 함
+[22m[39m[privacy] 마스킹 처리 시간: 0.048ms (29자)
+
+[90mstdout[2m | src/utils/privacy.test.ts[2m > [22m[2mmaskPhoneNumber - 성능 테스트[2m > [22m[2m대용량 텍스트 (10KB) 처리는 50ms 이하여야 함
+[22m[39m[privacy] 마스킹 처리 시간: 0.295ms (13000자)
+
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 기본 기능 테스트[2m > [22m하이픈 구분 전화번호를 마스킹해야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 기본 기능 테스트[2m > [22m점 구분 전화번호를 마스킹해야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 기본 기능 테스트[2m > [22m구분자 없는 전화번호를 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 기본 기능 테스트[2m > [22m여러 전화번호를 모두 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 기본 기능 테스트[2m > [22m커스텀 대체 텍스트를 사용할 수 있어야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - False Positive 방지 테스트[2m > [22m날짜 패턴을 전화번호로 오인하지 않아야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - False Positive 방지 테스트[2m > [22m사업자등록번호를 전화번호로 오인하지 않아야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - False Positive 방지 테스트[2m > [22m긴 숫자 문자열의 일부를 전화번호로 오인하지 않아야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - False Positive 방지 테스트[2m > [22m010으로 시작하지만 전화번호가 아닌 패턴을 마스킹하지 않아야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - Edge Case 테스트[2m > [22m빈 문자열을 처리해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - Edge Case 테스트[2m > [22mnull과 undefined를 안전하게 처리해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - Edge Case 테스트[2m > [22m전화번호가 없는 텍스트는 변경하지 않아야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - Edge Case 테스트[2m > [22m전화번호만 있는 텍스트를 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - Edge Case 테스트[2m > [22m문자열이 아닌 타입을 안전하게 처리해야 함[32m 2[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumberDeep - 재귀 마스킹 테스트[2m > [22m객체의 모든 문자열 필드를 마스킹해야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumberDeep - 재귀 마스킹 테스트[2m > [22m배열의 모든 요소를 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumberDeep - 재귀 마스킹 테스트[2m > [22m중첩된 객체를 재귀적으로 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumberDeep - 재귀 마스킹 테스트[2m > [22mnull과 undefined를 안전하게 처리해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumberDeep - 재귀 마스킹 테스트[2m > [22m숫자와 boolean 타입은 변경하지 않아야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumberDeep - 재귀 마스킹 테스트[2m > [22m원본 객체를 변경하지 않아야 함 (불변성 유지)[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 성능 테스트[2m > [22m단일 메시지 처리는 1ms 이하여야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 성능 테스트[2m > [22m100개 메시지 처리는 10ms 이하여야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 성능 테스트[2m > [22m대용량 텍스트 (10KB) 처리는 50ms 이하여야 함[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 실전 시나리오 테스트[2m > [22m채팅 메시지 형식을 올바르게 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 실전 시나리오 테스트[2m > [22m문서 내용 형식을 올바르게 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/privacy.test.ts[2m > [22mmaskPhoneNumber - 실전 시나리오 테스트[2m > [22mAPI 응답 객체를 올바르게 마스킹해야 함[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mpickFirstString[2m > [22mshould return the first non-empty string[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mpickFirstString[2m > [22mshould return undefined if no valid strings are found[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mpickFirstString[2m > [22mshould ignore strings with only whitespace[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mmapHistoryEntryToChatMessage[2m > [22mshould map user role entry correctly[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mmapHistoryEntryToChatMessage[2m > [22mshould map assistant role entry correctly with multiple content candidates[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mmapHistoryEntryToChatMessage[2m > [22mshould infer role based on index if role is missing[32m 0[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mmapHistoryEntryToChatMessage[2m > [22mshould include sources if present[32m 1[2mms[22m[39m
+ [32m✓[39m src/utils/chat/__tests__/mappers.test.ts[2m > [22mmappers[2m > [22mmapHistoryEntryToChatMessage[2m > [22mshould fallback ID to timestamp or generated string[32m 0[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChunkDetailModal.test.tsx[2m > [22mChunkDetailModal[2m > [22mshould render modal content when open[32m 74[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChunkDetailModal.test.tsx[2m > [22mChunkDetailModal[2m > [22mshould not render when open is false[32m 2[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChunkDetailModal.test.tsx[2m > [22mChunkDetailModal[2m > [22mshould call onClose when close button or close action clicked[32m 23[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChunkDetailModal.test.tsx[2m > [22mChunkDetailModal[2m > [22mshould render document info items[32m 22[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChunkDetailModal.test.tsx[2m > [22mChunkDetailModal[2m > [22mshould hide text content for TXT files if shouldHideTxtContent is true[32m 10[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChunkDetailModal.test.tsx[2m > [22mChunkDetailModal[2m > [22mshould show fallback if no document info[32m 7[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatInput.test.tsx[2m > [22mChatInput[2m > [22mshould render input field and button[32m 100[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatInput.test.tsx[2m > [22mChatInput[2m > [22mshould call setInput when typing[32m 23[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatInput.test.tsx[2m > [22mChatInput[2m > [22mshould handle send button click when input is valid[32m 15[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatInput.test.tsx[2m > [22mChatInput[2m > [22mshould disable button when input is empty and not loading[32m 12[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatInput.test.tsx[2m > [22mChatInput[2m > [22mshould NOT disable button when loading (Stop button mode)[32m 17[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatInput.test.tsx[2m > [22mChatInput[2m > [22mshould call handleKeyPress on key down[32m 10[2mms[22m[39m
+[90mstderr[2m | src/components/chat/__tests__/ChatMessageItem.test.tsx[2m > [22m[2mChatMessageItem[2m > [22m[2mshould render assistant message with markdown
+[22m[39mReceived `true` for a non-boolean attribute `button`.
+
+If you want to write it to the DOM, pass a string instead: button="true" or button={value.toString()}.
+
+ [32m✓[39m src/components/chat/__tests__/ChatHeader.test.tsx[2m > [22mChatHeader[2m > [22mshould render session ID correctly[32m 49[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatHeader.test.tsx[2m > [22mChatHeader[2m > [22mshould show developer tools button when showDevTools is false[32m 14[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatHeader.test.tsx[2m > [22mChatHeader[2m > [22mshould hide developer tools button when showDevTools is true[32m 9[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatHeader.test.tsx[2m > [22mChatHeader[2m > [22mshould render title and subtitle[32m 8[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageItem.test.tsx[2m > [22mChatMessageItem[2m > [22mshould render user message correctly[32m 33[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageItem.test.tsx[2m > [22mChatMessageItem[2m > [22mshould render assistant message with markdown[32m 39[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageItem.test.tsx[2m > [22mChatMessageItem[2m > [22mshould show sources for assistant message if present[32m 22[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageItem.test.tsx[2m > [22mChatMessageItem[2m > [22mshould call onChunkClick when source is clicked[32m 17[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageItem.test.tsx[2m > [22mChatMessageItem[2m > [22mshould render copy button for assistant message and handle click[32m 10[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageList.test.tsx[2m > [22mChatMessageList[2m > [22mshould render empty state when no messages and not loading[32m 23[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageList.test.tsx[2m > [22mChatMessageList[2m > [22mshould handle suggestion click in empty state[32m 6[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageList.test.tsx[2m > [22mChatMessageList[2m > [22mshould render messages[32m 4[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatMessageList.test.tsx[2m > [22mChatMessageList[2m > [22mshould render loading indicator[32m 13[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatDevTools.test.tsx[2m > [22mChatDevTools[2m > [22mshould return null if showDevTools is false[32m 9[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatDevTools.test.tsx[2m > [22mChatDevTools[2m > [22mshould render session info correctly in tab 0[32m 56[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatDevTools.test.tsx[2m > [22mChatDevTools[2m > [22mshould render API logs in tab 1[32m 30[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatDevTools.test.tsx[2m > [22mChatDevTools[2m > [22mshould show empty state for API logs if empty[32m 7[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatDevTools.test.tsx[2m > [22mChatDevTools[2m > [22mshould call handleNewSession on button click[32m 19[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatDevTools.test.tsx[2m > [22mChatDevTools[2m > [22mshould switch tabs[32m 19[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatDevTools.test.tsx[2m > [22mChatDevTools[2m > [22mshould copy log on click[32m 23[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatTab.test.tsx[2m > [22mChatTab Integration[2m > [22mrenders key child components[32m 111[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatTab.test.tsx[2m > [22mChatTab Integration[2m > [22mpasses handlers to child components[32m 51[2mms[22m[39m
+ [32m✓[39m src/components/chat/__tests__/ChatTab.test.tsx[2m > [22mChatTab Integration[2m > [22mshows dev tools when enabled[32m 47[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m17 passed[39m[22m[90m (17)[39m
+[2m      Tests [22m [1m[32m124 passed[39m[22m[90m (124)[39m
+[2m   Start at [22m 21:19:56
+[2m   Duration [22m 12.06s[2m (transform 2.41s, setup 21.11s, collect 64.39s, tests 1.56s, environment 13.55s, prepare 778ms)[22m
+

@@ -8,6 +8,9 @@ import { FeatureProvider } from './core/FeatureProvider';
 import { useIsModuleEnabled } from './core/useFeature';
 import { ConfigProvider } from './core/ConfigProvider';
 import { WebSocketProvider } from './core/WebSocketProvider';
+import { ChatAPIProvider } from './core/ChatAPIProvider';
+import { createChatAPIService } from './services/chatAPIService';
+import { defaultChatAPIConfig } from './types/chatAPI';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -299,6 +302,7 @@ function AppRoutes() {
  * - ConfigProvider: 런타임 설정 제공 (API URL, 환경 변수 등)
  * - FeatureProvider: Feature Flag 제공 (모듈별 활성화 상태)
  * - WebSocketProvider: WebSocket DI 제공 (팩토리 및 설정)
+ * - ChatAPIProvider: Chat API DI 제공 (서비스 팩토리 및 설정)
  * - Router: 라우팅 관리
  */
 function App() {
@@ -306,9 +310,14 @@ function App() {
     <ConfigProvider>
       <FeatureProvider>
         <WebSocketProvider>
-          <Router>
-            <AppRoutes />
-          </Router>
+          <ChatAPIProvider
+            createService={createChatAPIService}
+            config={defaultChatAPIConfig}
+          >
+            <Router>
+              <AppRoutes />
+            </Router>
+          </ChatAPIProvider>
         </WebSocketProvider>
       </FeatureProvider>
     </ConfigProvider>

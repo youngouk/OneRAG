@@ -440,3 +440,15 @@ export {
   defaultWebSocketFactory,
   defaultWebSocketConfig,
 } from './websocket';
+
+// Chat API DI 패턴 타입
+export type {
+  IChatAPIService,
+  ChatAPIFactory,
+  ChatAPIConfig,
+  ChatAPIResponse,
+  ChatAPISessionInfo,
+  ChatAPIHistoryEntry,
+  ChatAPISearchSource,
+} from './chatAPI';
+export { defaultChatAPIConfig } from './chatAPI';

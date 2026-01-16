@@ -5,6 +5,11 @@
  *
  * @example
  * import { MockWebSocket, createMockWebSocketFactory } from '@/test-utils';
+ * import { MockChatAPIService, createMockChatAPIFactory } from '@/test-utils';
  */
 
+// WebSocket Mock
 export { MockWebSocket, createMockWebSocketFactory } from './MockWebSocket';
+
+// Chat API Mock
+export { MockChatAPIService, createMockChatAPIFactory } from './MockChatAPIService';

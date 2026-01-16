@@ -41,3 +41,14 @@ export {
   useWebSocketFactory,
   useWebSocketConfig,
 } from './useWebSocket';
+
+// ChatAPI 관련 (DI 패턴)
+export { ChatAPIContext } from './ChatAPIContext';
+export type { ChatAPIContextValue } from './ChatAPIContext';
+export { ChatAPIProvider } from './ChatAPIProvider';
+export type { ChatAPIProviderProps } from './ChatAPIProvider';
+export {
+  useChatAPI,
+  useChatAPIService,
+  useChatAPIConfig,
+} from './useChatAPI';
