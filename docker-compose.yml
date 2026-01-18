@@ -57,6 +57,10 @@ services:
       ENVIRONMENT: "development"
       # 로컬 임베딩 (API 키 불필요 - Quickstart용)
       EMBEDDINGS_PROVIDER: "local"
+      # LLM 설정 (Quickstart용 - Google Gemini 무료 티어)
+      LLM_PROVIDER: "${LLM_PROVIDER:-google}"
+      LLM_MODEL: "${LLM_MODEL:-gemini-2.0-flash}"
+      GENERATION_PROVIDER: "${GENERATION_PROVIDER:-google}"
     depends_on:
       weaviate:
         condition: service_healthy

@@ -33,8 +33,9 @@ from .prompt_manager import PromptManager
 logger = get_logger(__name__)
 
 
-# OpenRouter API 기본 URL
+# LLM Provider별 API URL
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+GOOGLE_OPENAI_COMPAT_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
 
 class Stats(TypedDict):
@@ -108,14 +109,23 @@ class GenerationModule:
         self.privacy_masker = privacy_masker
         self._privacy_enabled = privacy_masker is not None
 
-        # OpenRouter 설정
-        self.openrouter_config = self.gen_config.get("openrouter", {})
+        # Provider 설정 (환경변수 우선, 기본값 openrouter)
+        self.provider = self.gen_config.get("default_provider", "openrouter")
+
+        # Provider별 설정 로드
+        self.provider_config = self.gen_config.get(self.provider, {})
+        self.openrouter_config = self.gen_config.get("openrouter", {})  # 레거시 호환
         self.models_config = self.gen_config.get("models", {})
 
-        # 기본 모델 및 Fallback 순서
-        self.default_model = self.openrouter_config.get(
-            "default_model", "anthropic/claude-sonnet-4-5"
-        )
+        # 기본 모델 (provider에 따라 다름)
+        if self.provider == "google":
+            self.default_model = self.provider_config.get(
+                "default_model", "gemini-2.0-flash"
+            )
+        else:
+            self.default_model = self.openrouter_config.get(
+                "default_model", "anthropic/claude-sonnet-4-5"
+            )
         self.fallback_models = self.gen_config.get(
             "fallback_models",
             [
@@ -149,13 +159,57 @@ class GenerationModule:
 
     async def initialize(self) -> None:
         """
-        모듈 초기화 - OpenRouter 클라이언트 생성
+        모듈 초기화 - LLM 클라이언트 생성
 
-        환경변수 OPENROUTER_API_KEY 또는 config에서 API 키 로드
+        Provider에 따라 다른 API 사용:
+        - google: Google Gemini OpenAI 호환 API (GOOGLE_API_KEY)
+        - openrouter: OpenRouter 통합 API (OPENROUTER_API_KEY)
         """
-        logger.info("🚀 GenerationModule 초기화 시작 (OpenRouter 통합 모드)")
+        logger.info(f"🚀 GenerationModule 초기화 시작 (provider: {self.provider})")
 
-        # API 키 로드
+        # Provider별 클라이언트 초기화
+        if self.provider == "google":
+            self._initialize_google_client()
+        else:
+            self._initialize_openrouter_client()
+
+        # Phase 2: 개인정보 마스킹 상태 로그
+        privacy_status = "enabled" if self._privacy_enabled else "disabled"
+        timeout = self.provider_config.get("timeout", 120)
+
+        logger.info(
+            f"✅ GenerationModule 초기화 완료 "
+            f"(provider: {self.provider}, 기본 모델: {self.default_model}, "
+            f"timeout: {timeout}s, privacy_masking={privacy_status})"
+        )
+
+    def _initialize_google_client(self) -> None:
+        """Google Gemini OpenAI 호환 API 클라이언트 초기화"""
+        api_key = self.provider_config.get("api_key") or os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "Google API 키가 설정되지 않았습니다. "
+                "해결 방법: 1) 환경변수 GOOGLE_API_KEY를 설정하거나, "
+                "2) config.yaml의 generation.google.api_key를 추가하세요. "
+                "무료 API 키는 https://aistudio.google.com/apikey 에서 발급받을 수 있습니다."
+            )
+
+        timeout = self.provider_config.get("timeout", 120)
+
+        # Google OpenAI 호환 API 클라이언트 초기화
+        self.client = OpenAI(
+            base_url=GOOGLE_OPENAI_COMPAT_URL,
+            api_key=api_key,
+            timeout=timeout,
+            max_retries=0,
+            http_client=httpx.Client(
+                timeout=httpx.Timeout(timeout, connect=10.0),
+                limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+            ),
+        )
+
+    def _initialize_openrouter_client(self) -> None:
+        """OpenRouter 클라이언트 초기화 (레거시)"""
         api_key = self.openrouter_config.get("api_key") or os.getenv("OPENROUTER_API_KEY")
         if not api_key:
             raise ValueError(
@@ -165,7 +219,6 @@ class GenerationModule:
                 "API 키는 https://openrouter.ai/keys 에서 발급받을 수 있습니다."
             )
 
-        # timeout 설정
         timeout = self.openrouter_config.get("timeout", 120)
 
         # OpenRouter 클라이언트 초기화 (OpenAI SDK 사용)
@@ -173,7 +226,7 @@ class GenerationModule:
             base_url=OPENROUTER_BASE_URL,
             api_key=api_key,
             timeout=timeout,
-            max_retries=0,  # 재시도 없이 Fallback 처리
+            max_retries=0,
             http_client=httpx.Client(
                 timeout=httpx.Timeout(timeout, connect=10.0),
                 limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
@@ -182,15 +235,6 @@ class GenerationModule:
                 "HTTP-Referer": self.openrouter_config.get("site_url", ""),
                 "X-Title": self.openrouter_config.get("app_name", "RAG-Chatbot"),
             },
-        )
-
-        # Phase 2: 개인정보 마스킹 상태 로그
-        privacy_status = "enabled" if self._privacy_enabled else "disabled"
-
-        logger.info(
-            f"✅ GenerationModule 초기화 완료 "
-            f"(기본 모델: {self.default_model}, timeout: {timeout}s, "
-            f"privacy_masking={privacy_status})"
         )
 
     async def destroy(self) -> None:
@@ -751,7 +795,7 @@ class GenerationModule:
 
     async def get_available_providers(self) -> list[str]:
         """레거시 호환: 사용 가능한 프로바이더 목록"""
-        return ["openrouter"]
+        return [self.provider]
 
     async def test_provider(self, provider: str) -> dict[str, Any]:
         """레거시 호환: 프로바이더 테스트"""

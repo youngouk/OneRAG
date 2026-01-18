@@ -108,8 +108,10 @@ llm:
   # 기존 코드 호환을 위해 유지, 새 코드에서는 사용하지 않음
 
   google:
-    model: "google/gemini-2.5-flash"  # OpenRouter 형식
-    api_key: "${OPENROUTER_API_KEY:-}"
+    # Quickstart용: 직접 Google Gemini API 사용
+    # GOOGLE_API_KEY 환경변수 필요 (무료: https://aistudio.google.com/apikey)
+    model: "${LLM_MODEL:-gemini-2.0-flash}"
+    api_key: "${GOOGLE_API_KEY:-}"
     temperature: 0.3
     max_tokens: 20000
 

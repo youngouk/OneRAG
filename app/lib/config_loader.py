@@ -246,8 +246,11 @@ class ConfigLoader:
             # Quickstart 지원: 임베딩/LLM 환경 변수 오버라이드
             # YAML 설정보다 환경 변수가 우선 적용됨
             "EMBEDDINGS_PROVIDER": ("embeddings", "provider"),
-            "LLM_PROVIDER": ("llm", "provider"),
+            # LLM 설정: llm.default_provider와 generation.default_provider 둘 다 오버라이드
+            "LLM_PROVIDER": ("llm", "default_provider"),
             "LLM_MODEL": ("llm", "model"),
+            # Generation 모듈도 같은 provider 사용
+            "GENERATION_PROVIDER": ("generation", "default_provider"),
         }
         for env_var, config_path in env_mappings.items():
             value = os.getenv(env_var)
