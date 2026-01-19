@@ -4,6 +4,7 @@ Reranker Module - 검색 결과 리랭킹 모듈
 구현체:
 - JinaReranker: Jina AI HTTP API 기반 리랭커
 - JinaColBERTReranker: Jina ColBERT v2 기반 토큰 수준 리랭커
+- CohereReranker: Cohere Rerank API 기반 리랭커 (cross-encoder 방식)
 - OpenAILLMReranker: OpenAI 모델 기반 LLM 리랭커 (모델 설정 가능)
 - GeminiFlashReranker: Google Gemini 2.5 Flash Lite 기반 LLM 리랭커
 - RerankerChain: 다중 리랭커 순차 실행 체인
@@ -11,6 +12,7 @@ Reranker Module - 검색 결과 리랭킹 모듈
 """
 
 from ..interfaces import IReranker  # 상위 디렉토리의 interfaces.py에서 import
+from .cohere_reranker import CohereReranker
 from .colbert_reranker import ColBERTRerankerConfig, JinaColBERTReranker
 from .factory import SUPPORTED_RERANKERS, RerankerFactory
 from .gemini_reranker import GeminiFlashReranker
@@ -23,6 +25,7 @@ __all__ = [
     "JinaReranker",
     "JinaColBERTReranker",
     "ColBERTRerankerConfig",
+    "CohereReranker",
     "OpenAILLMReranker",
     "GeminiFlashReranker",
     "RerankerChain",
