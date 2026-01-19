@@ -57,7 +57,7 @@ def wait_for_weaviate(url: str, max_retries: int = 30, delay: float = 2.0) -> bo
     return False
 
 
-def initialize_embedder() -> "LocalEmbedder | None":  # type: ignore[name-defined]
+def initialize_embedder() -> "LocalEmbedder | None":  # type: ignore[name-defined]  # noqa: F821
     """
     로컬 임베딩 모델 초기화
 
