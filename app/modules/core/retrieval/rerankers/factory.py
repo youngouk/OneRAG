@@ -52,6 +52,10 @@ APPROACH_REGISTRY: dict[str, dict[str, Any]] = {
         "description": "Late-Interaction 리랭커 (토큰 레벨 상호작용, ColBERT)",
         "providers": ["jina"],
     },
+    "local": {
+        "description": "로컬 CrossEncoder 리랭커 (API 키 불필요)",
+        "providers": ["sentence-transformers"],
+    },
 }
 
 PROVIDER_REGISTRY: dict[str, dict[str, Any]] = {
@@ -108,6 +112,14 @@ PROVIDER_REGISTRY: dict[str, dict[str, Any]] = {
             "model": "google/gemini-2.5-flash-lite",
             "max_documents": 20,
             "timeout": 15,
+        },
+    },
+    "sentence-transformers": {
+        "class": None,  # 조건부 로드
+        "api_key_env": None,  # API 키 불필요
+        "default_config": {
+            "model": "cross-encoder/ms-marco-MiniLM-L-12-v2",
+            "batch_size": 32,
         },
     },
 }
@@ -179,6 +191,8 @@ class RerankerFactoryV2:
             return RerankerFactoryV2._create_late_interaction_reranker(
                 provider, reranking_config
             )
+        elif approach == "local":
+            return RerankerFactoryV2._create_local_reranker(provider, reranking_config)
         else:
             raise ValueError(f"알 수 없는 approach: {approach}")
 
@@ -298,6 +312,31 @@ class RerankerFactoryV2:
             raise ValueError(
                 f"Late-interaction approach에서 {provider}는 아직 지원되지 않습니다."
             )
+
+        logger.info(f"✅ {reranker.__class__.__name__} 생성 완료")
+        return reranker
+
+    @staticmethod
+    def _create_local_reranker(
+        provider: str, config: dict[str, Any]
+    ) -> IReranker:
+        """Local approach 리랭커 생성 (API 키 불필요)"""
+        try:
+            from .local_reranker import LocalReranker
+        except ImportError:
+            raise ImportError(
+                "LocalReranker를 사용하려면 sentence-transformers가 필요합니다. "
+                "설치: uv sync --extra local-reranker"
+            )
+
+        # config에서 sentence-transformers 또는 local 키로 설정 조회
+        provider_config = config.get("sentence-transformers", config.get("local", {}))
+        defaults = PROVIDER_REGISTRY["sentence-transformers"]["default_config"]
+
+        reranker = LocalReranker(
+            model_name=provider_config.get("model", defaults["model"]),
+            batch_size=provider_config.get("batch_size", defaults["batch_size"]),
+        )
 
         logger.info(f"✅ {reranker.__class__.__name__} 생성 완료")
         return reranker

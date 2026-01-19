@@ -18,7 +18,6 @@ from pydantic import Field, model_validator
 
 from .base import BaseConfig
 
-
 # ========================================
 # Provider별 설정 스키마
 # ========================================
@@ -143,6 +142,21 @@ class OpenRouterProviderConfig(BaseConfig):
     )
 
 
+class LocalProviderConfig(BaseConfig):
+    """로컬 CrossEncoder provider 설정 (API 키 불필요)"""
+
+    model: str = Field(
+        default="cross-encoder/ms-marco-MiniLM-L-12-v2",
+        description="HuggingFace CrossEncoder 모델명",
+    )
+    batch_size: int = Field(
+        default=32,
+        ge=1,
+        le=256,
+        description="배치 크기",
+    )
+
+
 # ========================================
 # 메인 설정 스키마
 # ========================================
@@ -152,6 +166,7 @@ VALID_APPROACH_PROVIDERS: dict[str, list[str]] = {
     "llm": ["google", "openai", "openrouter"],
     "cross-encoder": ["jina", "cohere"],
     "late-interaction": ["jina"],
+    "local": ["sentence-transformers"],
 }
 
 
@@ -174,12 +189,14 @@ class RerankingConfigV2(BaseConfig):
         description="리랭킹 활성화 여부",
     )
 
-    approach: Literal["llm", "cross-encoder", "late-interaction"] = Field(
+    approach: Literal["llm", "cross-encoder", "late-interaction", "local"] = Field(
         default="cross-encoder",
         description="리랭킹 기술 방식",
     )
 
-    provider: Literal["google", "openai", "jina", "cohere", "openrouter"] = Field(
+    provider: Literal[
+        "google", "openai", "jina", "cohere", "openrouter", "sentence-transformers"
+    ] = Field(
         default="jina",
         description="서비스 제공자",
     )
@@ -204,6 +221,11 @@ class RerankingConfigV2(BaseConfig):
     openrouter: OpenRouterProviderConfig | None = Field(
         default=None,
         description="OpenRouter 설정",
+    )
+    local: LocalProviderConfig | None = Field(
+        default=None,
+        alias="sentence-transformers",
+        description="로컬 CrossEncoder 설정 (API 키 불필요)",
     )
 
     @model_validator(mode="after")

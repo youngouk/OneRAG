@@ -117,6 +117,35 @@ class TestRerankerFactoryV2Create:
         reranker = RerankerFactoryV2.create(config)
         assert reranker.__class__.__name__ == "CohereReranker"
 
+    def test_create_local_sentence_transformers(self):
+        """Local approach + sentence-transformers provider 리랭커 생성"""
+        from app.modules.core.retrieval.rerankers.factory import RerankerFactoryV2
+
+        config = {
+            "reranking": {
+                "approach": "local",
+                "provider": "sentence-transformers",
+                "sentence-transformers": {
+                    "model": "cross-encoder/ms-marco-MiniLM-L-12-v2",
+                },
+            }
+        }
+        reranker = RerankerFactoryV2.create(config)
+        assert reranker.__class__.__name__ == "LocalReranker"
+
+    def test_create_local_with_default_config(self):
+        """Local approach 기본 설정으로 리랭커 생성"""
+        from app.modules.core.retrieval.rerankers.factory import RerankerFactoryV2
+
+        config = {
+            "reranking": {
+                "approach": "local",
+                "provider": "sentence-transformers",
+            }
+        }
+        reranker = RerankerFactoryV2.create(config)
+        assert reranker.__class__.__name__ == "LocalReranker"
+
     def test_create_with_invalid_approach_raises_error(self):
         """유효하지 않은 approach 시 에러"""
         from app.modules.core.retrieval.rerankers.factory import RerankerFactoryV2
@@ -146,10 +175,10 @@ class TestRerankerFactoryV2Create:
     @patch.dict("os.environ", {}, clear=True)
     def test_create_without_api_key_raises_error(self):
         """API 키 없이 생성 시 에러"""
-        from app.modules.core.retrieval.rerankers.factory import RerankerFactoryV2
-
         # 환경변수 전부 제거 후 테스트
         import os
+
+        from app.modules.core.retrieval.rerankers.factory import RerankerFactoryV2
         original_keys = {
             k: os.environ.pop(k, None)
             for k in ["GOOGLE_API_KEY", "OPENAI_API_KEY", "JINA_API_KEY"]
@@ -183,6 +212,7 @@ class TestRerankerFactoryV2Helpers:
         assert "llm" in approaches
         assert "cross-encoder" in approaches
         assert "late-interaction" in approaches
+        assert "local" in approaches
 
     def test_get_providers_for_approach(self):
         """approach별 유효한 provider 목록 조회"""
@@ -197,6 +227,9 @@ class TestRerankerFactoryV2Helpers:
         assert "jina" in ce_providers
         assert "google" not in ce_providers
 
+        local_providers = RerankerFactoryV2.get_providers_for_approach("local")
+        assert "sentence-transformers" in local_providers
+
     def test_get_approach_description(self):
         """approach 설명 조회"""
         from app.modules.core.retrieval.rerankers.factory import RerankerFactoryV2
@@ -210,6 +243,9 @@ class TestRerankerFactoryV2Helpers:
         desc = RerankerFactoryV2.get_approach_description("late-interaction")
         assert "Late" in desc or "토큰" in desc
 
+        desc = RerankerFactoryV2.get_approach_description("local")
+        assert "로컬" in desc or "API" in desc
+
     def test_get_all_providers(self):
         """모든 provider 목록 조회"""
         from app.modules.core.retrieval.rerankers.factory import RerankerFactoryV2
@@ -220,3 +256,4 @@ class TestRerankerFactoryV2Helpers:
         assert "jina" in providers
         assert "cohere" in providers
         assert "openrouter" in providers
+        assert "sentence-transformers" in providers
