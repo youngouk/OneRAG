@@ -1,12 +1,12 @@
 # RAG_Standard 코드 품질 분석 보고서
 
-> 분석일: 2026-01-19
-> 버전: v1.2.0
-> 상태: 🟢 안정화 완료 (Reranker 설정 v2 리팩토링 완료)
+> 분석일: 2026-01-20
+> 버전: v1.2.1
+> 상태: 🟢 안정화 완료 (Reranker 확장 완료: Cohere, Local 추가)
 
 ## 요약
 
-RAG_Standard 프로젝트는 **코드 정리가 완료된 상태**입니다. Phase 1, 2, 3 개선으로 모든 deprecated 함수가 제거/리팩토링되고 DI 패턴이 완성되었습니다. v1.1.0에서는 Reranker 설정이 3단계 계층 구조로 리팩토링되었습니다.
+RAG_Standard 프로젝트는 **코드 정리가 완료된 상태**입니다. Phase 1, 2, 3 개선으로 모든 deprecated 함수가 제거/리팩토링되고 DI 패턴이 완성되었습니다. v1.2.1에서는 Reranker에 Cohere, Local(sentence-transformers) 지원이 추가되었습니다.
 
 | 카테고리 | 현황 | 우선순위 |
 |---------|------|---------|
@@ -14,9 +14,9 @@ RAG_Standard 프로젝트는 **코드 정리가 완료된 상태**입니다. Pha
 | 팩토리 패턴 | 9개 명시적 팩토리 | 🟢 유지 |
 | 레거시 코드 | ✅ 모든 deprecated 함수 제거 완료 | 🟢 완료 |
 | 전역 상태 | ✅ DI Container로 완전 이전 | 🟢 완료 |
-| 테스트 | 1,637개 통과, 일부 skip | 🟢 양호 |
+| 테스트 | 1,700+개 통과, 일부 skip | 🟢 양호 |
 | Multi Vector DB | ✅ 6종 지원 완료 | 🟢 완료 |
-| Reranker 설정 | ✅ v2 3단계 계층 구조 리팩토링 완료 | 🟢 완료 |
+| Reranker 설정 | ✅ v2.1 (4 approach, 6 provider) | 🟢 완료 |
 
 ---
 
@@ -233,24 +233,33 @@ reranking:
 ```
 
 **approach-provider 유효 조합**:
-| approach | 유효한 provider |
-|----------|----------------|
-| `llm` | google, openai, openrouter |
-| `cross-encoder` | jina, cohere |
-| `late-interaction` | jina |
+| approach | 유효한 provider | 특징 |
+|----------|----------------|------|
+| `llm` | google, openai, openrouter | LLM의 언어 이해력 활용 |
+| `cross-encoder` | jina, cohere | 쿼리+문서 쌍 인코딩 |
+| `late-interaction` | jina | ColBERT 토큰 레벨 상호작용 |
+| `local` | sentence-transformers | API 키 불필요, 오프라인 사용 |
 
 **주요 변경 사항**:
 - `RerankerFactoryV2` 추가 (새 코드에서 사용 권장)
 - `RerankerFactory` 레거시 호환 유지 (기존 설정 자동 변환)
 - Pydantic 기반 approach-provider 조합 검증
-- 33개 신규 테스트 추가
+- 62개 신규 테스트 추가 (v1.2.1)
+
+**v1.2.1 신규 Provider**:
+- **Cohere**: `rerank-multilingual-v3.0` 모델, 100+ 언어 지원
+- **Local (sentence-transformers)**: API 키 불필요, 오프라인 사용 가능
+  - 설치: `uv sync --extra local-reranker`
+  - 기본 모델: `cross-encoder/ms-marco-MiniLM-L-12-v2` (130MB)
 
 **파일 구조**:
 ```
-app/config/schemas/reranking.py           # RerankingConfigV2 + RerankingConfig 별칭
-app/modules/core/retrieval/rerankers/factory.py  # RerankerFactoryV2 + RerankerFactory (레거시)
-app/config/schemas/_legacy/               # 레거시 스키마 보관
-app/modules/core/retrieval/rerankers/_legacy/    # 레거시 팩토리 보관
+app/config/schemas/reranking.py                         # RerankingConfigV2 + RerankingConfig 별칭
+app/modules/core/retrieval/rerankers/factory.py         # RerankerFactoryV2 + RerankerFactory (레거시)
+app/modules/core/retrieval/rerankers/cohere_reranker.py # Cohere Reranker 구현
+app/modules/core/retrieval/rerankers/local_reranker.py  # Local Reranker 구현
+app/config/schemas/_legacy/                             # 레거시 스키마 보관
+app/modules/core/retrieval/rerankers/_legacy/           # 레거시 팩토리 보관
 ```
 
 ### 장기 (선택적)
@@ -278,6 +287,8 @@ RAG_Standard는 **코드 정리가 완료된 프로젝트**입니다:
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| v1.2.1 | 2026-01-20 | Reranker 확장: Cohere, Local(sentence-transformers) 추가, 4 approach/6 provider 지원 |
+| v1.2.0 | 2026-01-19 | Reranker 설정 v2 리팩토링: 3단계 계층 구조 (approach/provider/model) |
 | v1.0.7 | 2026-01-10 | Phase 3: get_performance_metrics() → _get_performance_metrics() 리팩토링 (TDD) |
 | v1.0.6 | 2026-01-10 | Phase 1, 2 deprecated 함수 완전 제거 (-105줄) |
 | v1.0.5 | 2026-01-09 | Multi Vector DB 6종 지원 추가 |

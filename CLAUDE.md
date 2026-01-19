@@ -1,13 +1,13 @@
-# CLAUDE.md (v1.2.0)
+# CLAUDE.md (v1.2.1)
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 프로젝트 개요
 도메인 범용화된 완벽한 오픈소스 RAG 시스템. 2026년 기준 가장 진보된 RAG 기술들을 하나의 표준 파이프라인으로 통합한 엔터프라이즈급 솔루션입니다.
 
-- **버전**: 1.2.0
-- **상태**: ✅ **1,637+개 테스트 통과**, ✅ **보안 완비**, ✅ **DI 패턴 완성**, ✅ **Streaming API**, ✅ **WebSocket**
-- **주요 개선**: Reranker 설정 3단계 계층 구조 리팩토링 (v1.2.0)
+- **버전**: 1.2.1
+- **상태**: ✅ **1,700+개 테스트 통과**, ✅ **보안 완비**, ✅ **DI 패턴 완성**, ✅ **Streaming API**, ✅ **WebSocket**
+- **주요 개선**: Reranker 확장 - Cohere, Local(sentence-transformers) 추가 (v1.2.1)
 
 ## 🚀 Quickstart (3단계)
 
@@ -81,10 +81,10 @@ make lint-imports       # 아키텍처 계층 검증 (Import Linter)
 ### 1. 지능형 검색 (Hybrid Retrieval)
 - **Weaviate**: Dense(의미) + Sparse(BM25) 하이브리드.
 - **GraphRAG**: `NetworkXGraphStore`에 벡터 검색 엔진 통합. "SAMSUNG"으로 "삼성전자" 노드 탐색 가능.
-- **Reranker v2**: 3단계 계층 구조 (approach → provider → model)로 명확한 설정
-  - **approach**: `llm` (LLM 기반), `cross-encoder` (전용 API), `late-interaction` (ColBERT)
-  - **provider**: google, openai, jina, cohere, openrouter
-  - **model**: 각 provider의 개별 설정에서 지정
+- **Reranker v2.1**: 3단계 계층 구조 (approach → provider → model)로 명확한 설정
+  - **approach**: `llm`, `cross-encoder`, `late-interaction`, `local` (4종)
+  - **provider**: google, openai, jina, cohere, openrouter, sentence-transformers (6종)
+  - **v1.2.1 신규**: Cohere (100+ 언어), Local (API 키 불필요, 오프라인 사용 가능)
 
 ### 2. 완벽한 보안 (Unified Security)
 - **PII Facade**: `PIIProcessor`가 단순 마스킹과 고도화된 AI 리뷰(`PIIReviewProcessor`)를 통합 관리.
@@ -206,7 +206,7 @@ app/config/environments/
 
 | 항목 | 현황 | 비고 |
 |------|------|------|
-| **전체 테스트** | 1,637+개 Pass | 단위/통합/안정성 테스트 완비 |
+| **전체 테스트** | 1,700+개 Pass | 단위/통합/안정성 테스트 완비 |
 | **Deprecated 함수** | 0건 | Phase 1,2,3 완료, 모든 deprecated 함수 제거/리팩토링 |
 | **보안 인증** | 완료 | 관리자 API 및 PII 보호 통합 |
 | **GraphRAG 지능** | 완료 | 벡터 검색 기반 엔티티 탐색 |
@@ -218,7 +218,7 @@ app/config/environments/
 | **Observability** | 완료 | 실시간 캐시 히트율/LLM 비용 모니터링 |
 | **Streaming API** | 완료 | SSE 기반 실시간 응답, Multi-LLM 스트리밍 지원 |
 | **WebSocket API** | 완료 | 양방향 실시간 채팅, RAG 파이프라인 통합 |
-| **Reranker 설정 v2** | 완료 | 3단계 계층 구조 (approach/provider/model) |
+| **Reranker 설정 v2.1** | 완료 | 4 approach, 6 provider (Cohere, Local 추가) |
 | **문서화** | 완료 | API Reference, 개발 가이드 등 12개 문서 |
 
 상세 기술부채 분석: `docs/TECHNICAL_DEBT_ANALYSIS.md`
@@ -230,3 +230,5 @@ app/config/environments/
 - **Vector DB**: 새 벡터 DB 추가 시 `VectorStoreFactory`에 등록
 - **모니터링**: 새 메트릭 추가 시 `RealtimeMetrics` 모델 확장
 - **Reranker**: `RerankerFactoryV2` 사용, approach/provider/model 3단계 구조 준수
+  - **지원 approach**: llm, cross-encoder, late-interaction, local
+  - **지원 provider**: google, openai, jina, cohere, openrouter, sentence-transformers
