@@ -1,16 +1,16 @@
-# RAG_Standard
+# OneRAG
 
 > **5분 안에 시작하고, 블록처럼 조립하는 RAG 시스템**
 
 **한국어** | [English](README_EN.md)
 
-[![CI](https://github.com/youngouk/RAG_Standard/actions/workflows/ci.yml/badge.svg)](https://github.com/youngouk/RAG_Standard/actions/workflows/ci.yml)
+[![CI](https://github.com/youngouk/OneRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/youngouk/OneRAG/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-## 왜 RAG_Standard인가?
+## 왜 OneRAG인가?
 
-| 기존 방식 | RAG_Standard |
+| 기존 방식 | OneRAG |
 |----------|--------------|
 | 특정 벡터 DB에 종속 | **6종 벡터 DB** 중 선택 (설정 1줄) |
 | 특정 LLM에 종속 | **4종 LLM** 중 선택 (설정 1줄) |
@@ -23,8 +23,8 @@
 
 ```bash
 # 1. 클론 및 설치
-git clone https://github.com/youngouk/RAG_Standard.git
-cd RAG_Standard && uv sync
+git clone https://github.com/youngouk/OneRAG.git
+cd OneRAG && uv sync
 
 # 2. 환경 설정 (API 키 하나만)
 cp quickstart/.env.quickstart .env

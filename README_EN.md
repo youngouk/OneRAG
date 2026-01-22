@@ -1,85 +1,32 @@
-# RAG_Standard
+# OneRAG
 
-> A project built by a non-developer PM who wanted to implement features across multiple projects, with the help of vibe coding.
-> Created to make RAG accessible to everyone for easy PoC and adoption decisions.
+> **Start in 5 minutes, assemble like building blocks**
 
 [한국어](README.md) | **English**
 
-[![CI](https://github.com/youngouk/RAG_Standard/actions/workflows/ci.yml/badge.svg)](https://github.com/youngouk/RAG_Standard/actions/workflows/ci.yml)
+[![CI](https://github.com/youngouk/OneRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/youngouk/OneRAG/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-## What is this
+## Why OneRAG?
 
-A modular RAG (Retrieval-Augmented Generation) backend that lets you build **only what you need**.
+| Traditional Approach | OneRAG |
+|---------------------|--------|
+| Locked to specific Vector DB | Choose from **6 Vector DBs** (1 line config) |
+| Locked to specific LLM | Choose from **4 LLMs** (1 line config) |
+| Code changes for new features | **YAML config** to toggle On/Off |
+| Build everything from scratch | Assemble **only what you need** |
 
-Designed with DI (Dependency Injection), you can mix and match features from simple vector search to full GraphRAG based on your project scale.
+---
 
-### RAG Pipeline
-
-```
-Query → Router → Expansion → Retriever → Cache → Reranker → Generator → PII Masking → Response
-```
-
-| Step | Feature | Description |
-|------|---------|-------------|
-| 1 | Query Routing | LLM/Rule-based query classification |
-| 2 | Query Expansion | Synonyms, stopwords, user dictionary |
-| 3 | Search | Vector/hybrid search (6 DBs) |
-| 4 | Caching | Memory, Redis, semantic cache |
-| 5 | Reranking | Cross-Encoder, ColBERT, LLM-based |
-| 6 | Response | Multi-LLM support (4 providers) |
-| 7 | Post-process | PII detection and masking |
-
-**Optional**: Self-RAG (self-evaluation), GraphRAG (reasoning), Agent (tool execution), SQL Search (metadata)
-
-### DI Container Components
-
-| Category | Components | Description |
-|----------|------------|-------------|
-| **Core** | LLM Factory, Circuit Breaker | Multi-LLM support, failure isolation |
-| **Retrieval** | Retriever, Reranker, Cache | Vector/hybrid search, reranking, semantic cache |
-| **BM25 Enhancement** | Synonyms, Stopwords, User Dictionary | Improved Korean search quality |
-| **Privacy** | PII Processor, Masker | PII detection and masking |
-| **Session** | Session, Memory | Conversation context management |
-| **GraphRAG** | Graph Store, Entity Extractor | Knowledge graph-based reasoning |
-| **Agent** | Agent Orchestrator, MCP | Agent and tool execution |
-| **Storage** | Vector Store, Metadata Store | Vector DB and metadata persistence |
-
-Each category can be enabled/disabled via YAML config, or you can swap implementations.
-
-## Who is this for
-
-- Developers who want to **build their own** RAG system
-- Teams that need a **vendor-agnostic** architecture (not locked to specific DB or LLM)
-- Projects that want to **scale incrementally** from prototype to production
-
-## Feature Selection Guide
-
-| Level | Components | Use Case |
-|-------|------------|----------|
-| **Basic** | Vector Search + LLM | Simple document Q&A |
-| **Standard** | Hybrid Search (Dense + BM25) + Reranker | Services where search quality matters (recommended) |
-| **Advanced** | + GraphRAG + Multi-Query | Complex relationship reasoning |
-
-All components are interface(Protocol)-based, so you can enable only what you need or swap implementations.
-
-## Supported
-
-**Vector DB** (6): Weaviate, Chroma, Pinecone, Qdrant, pgvector, MongoDB
-
-**LLM** (4): Google Gemini, OpenAI, Anthropic Claude, OpenRouter
-
-**Reranker** (6): Jina, Cohere, Google, OpenAI, OpenRouter, Local(sentence-transformers)
-
-## Quickstart
+## 5-Minute Quickstart
 
 ```bash
 # 1. Clone & Install
-git clone https://github.com/youngouk/RAG_Standard.git
-cd RAG_Standard && uv sync
+git clone https://github.com/youngouk/OneRAG.git
+cd OneRAG && uv sync
 
-# 2. Configure
+# 2. Configure (just one API key)
 cp quickstart/.env.quickstart .env
 # Set GOOGLE_API_KEY in .env (Free: https://aistudio.google.com/apikey)
 
@@ -87,12 +34,104 @@ cp quickstart/.env.quickstart .env
 make quickstart
 ```
 
-Test the API at http://localhost:8000/docs
+**Done!** Test at http://localhost:8000/docs
 
 ```bash
 # Stop
 make quickstart-down
 ```
+
+---
+
+## Assemble Like Building Blocks
+
+### Switch Vector DB (1 line)
+
+```bash
+# Just change one line in .env
+VECTOR_DB_PROVIDER=weaviate  # or chroma, pinecone, qdrant, pgvector, mongodb
+```
+
+### Switch LLM (1 line)
+
+```bash
+# Just change one line in .env
+LLM_PROVIDER=google  # or openai, anthropic, openrouter
+```
+
+### Switch Reranker (2 lines YAML)
+
+```yaml
+# app/config/features/reranking.yaml
+reranking:
+  approach: "cross-encoder"  # or late-interaction, llm, local
+  provider: "jina"           # or cohere, google, openai, openrouter, sentence-transformers
+```
+
+### Toggle Features (YAML config)
+
+```yaml
+# Enable caching
+cache:
+  enabled: true
+  type: "redis"  # or memory, semantic
+
+# Enable GraphRAG
+graph_rag:
+  enabled: true
+
+# Enable PII masking
+pii:
+  enabled: true
+```
+
+---
+
+## Available Building Blocks
+
+| Category | Options | How to Change |
+|----------|---------|---------------|
+| **Vector DB** | Weaviate, Chroma, Pinecone, Qdrant, pgvector, MongoDB | 1 env var |
+| **LLM** | Google Gemini, OpenAI, Anthropic Claude, OpenRouter | 1 env var |
+| **Reranker** | Jina, Cohere, Google, OpenAI, OpenRouter, Local | 2 lines YAML |
+| **Cache** | Memory, Redis, Semantic | 1 line YAML |
+| **Query Routing** | LLM-based, Rule-based | 1 line YAML |
+| **Korean Search** | Synonyms, Stopwords, User Dictionary | YAML config |
+| **Security** | PII Detection, Masking, Audit Logging | YAML config |
+| **GraphRAG** | Knowledge Graph-based Reasoning | 1 line YAML |
+| **Agent** | Tool Execution, MCP Protocol | YAML config |
+
+---
+
+## Step-by-Step Configuration Guide
+
+| Level | Components | Use Case |
+|-------|------------|----------|
+| **Basic** | Vector Search + LLM | Simple document Q&A |
+| **Standard** | + Hybrid Search + Reranker | Production services **(recommended)** |
+| **Advanced** | + GraphRAG + Agent | Complex reasoning, tool execution |
+
+Start with Basic, add blocks as needed.
+
+---
+
+## RAG Pipeline
+
+```
+Query → Router → Expansion → Retriever → Cache → Reranker → Generator → PII Masking → Response
+```
+
+| Step | Function | Swappable |
+|------|----------|-----------|
+| Query Routing | Classify query type | LLM/Rule selection |
+| Query Expansion | Synonyms, stopwords | Custom dictionaries |
+| Search | Vector/hybrid search | 6 DBs |
+| Caching | Response cache | 3 cache types |
+| Reranking | Sort search results | 6 rerankers |
+| Generation | LLM response | 4 LLMs |
+| Post-process | PII masking | Custom policies |
+
+---
 
 ## Development
 
@@ -103,7 +142,7 @@ make lint          # Lint check
 make type-check    # Type check
 ```
 
-## Docs
+## Documentation
 
 - [Setup Guide](docs/SETUP.md)
 - [Architecture](docs/TECHNICAL_DEBT_ANALYSIS.md)
@@ -113,3 +152,8 @@ make type-check    # Type check
 ## License
 
 MIT License
+
+---
+
+> This project was built by a RAG Chat Service PM who wanted to implement various features across multiple projects.
+> Designed to help newcomers easily run PoC and scale to production.
