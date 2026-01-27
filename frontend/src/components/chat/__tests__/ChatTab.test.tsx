@@ -8,7 +8,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 
 // Mock useFeature
 vi.mock('../../../core/useFeature', () => ({
-    useFeature: vi.fn().mockReturnValue({ hideTxtContent: false }),
+    useFeature: vi.fn().mockReturnValue({ maskPhoneNumbers: true }),
 }));
 
 // Describe the mock types for better TS support (optional but good)
@@ -73,7 +73,7 @@ describe('ChatTab Integration', () => {
         renderWithContext(<ChatTab {...defaultProps} />);
 
         // Check for Header text
-        expect(screen.getByText('HEXA RAG Chat')).toBeInTheDocument();
+        expect(screen.getByText('OneRAG Chat')).toBeInTheDocument();
 
         // Check for Input placeholder
         expect(screen.getByPlaceholderText('메시지를 입력하세요...')).toBeInTheDocument();

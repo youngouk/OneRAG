@@ -11,8 +11,8 @@
 // 브랜드 정보
 export const BRAND_CONFIG = {
   // 앱 이름
-  appName: '다이렉트 결혼준비',
-  appTitle: '다이렉트 결혼준비', // HTML title
+  appName: 'OneRAG',
+  appTitle: 'OneRAG', // HTML title
 
   // 로고 설정
   logo: {
@@ -28,7 +28,7 @@ export const BRAND_CONFIG = {
     // 애플 터치 아이콘
     appleTouchIcon: '/apple-touch-icon.png',
     // 로고 대체 텍스트
-    alt: '다이렉트 결혼준비 로고',
+    alt: 'OneRAG 로고',
     // 로고 사용 방식
     type: 'image' as 'image' | 'svg-component', // 'image': 이미지 파일, 'svg-component': SVG 컴포넌트
     // SVG 컴포넌트를 사용할 경우 폴백 이미지

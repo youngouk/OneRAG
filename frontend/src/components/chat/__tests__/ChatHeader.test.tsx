@@ -42,7 +42,7 @@ describe('ChatHeader', () => {
 
     it('should render title and subtitle', () => {
         renderWithContext(<ChatHeader {...defaultProps} />);
-        expect(screen.getByText('HEXA RAG Chat')).toBeInTheDocument();
+        expect(screen.getByText('OneRAG Chat')).toBeInTheDocument();
         expect(screen.getByText('- 궁금한 것을 질문해주세요!')).toBeInTheDocument();
     });
 

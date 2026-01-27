@@ -26,7 +26,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         <header className="px-6 py-4 border-b bg-gradient-to-r from-background to-muted/10 relative overflow-hidden backdrop-blur-sm">
             <div className="flex justify-between items-center relative z-10">
                 <div className="flex flex-col">
-                    <h1 className="text-xl font-bold tracking-tight leading-tight">HEXA RAG Chat</h1>
+                    <h1 className="text-xl font-bold tracking-tight leading-tight">OneRAG Chat</h1>
                     <p className="text-sm text-muted-foreground">- 궁금한 것을 질문해주세요!</p>
                 </div>
 

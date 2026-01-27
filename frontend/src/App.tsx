@@ -60,7 +60,7 @@ function LandingPageContent() {
   }, [isChatbotEnabled, isDocumentsEnabled, isPromptsEnabled, isAnalysisEnabled, isAdminEnabled, navigate]);
 
   const enabledModules = [
-    { id: 'bot', enabled: isChatbotEnabled, label: '챗봇 사용하기', icon: MessageSquare, description: 'AI 웨딩플래너와 대화하세요', path: '/bot', color: 'bg-blue-500/10 text-blue-500' },
+    { id: 'bot', enabled: isChatbotEnabled, label: '챗봇 사용하기', icon: MessageSquare, description: 'AI 어시스턴트와 대화하세요', path: '/bot', color: 'bg-blue-500/10 text-blue-500' },
     { id: 'upload', enabled: isDocumentsEnabled, label: '문서 관리', icon: UploadCloud, description: '지식 베이스 문서를 관리합니다', path: '/upload', color: 'bg-emerald-500/10 text-emerald-500' },
     { id: 'prompts', enabled: isPromptsEnabled, label: '프롬프트 관리', icon: BrainCircuit, description: 'AI 모델의 페르소나를 설정합니다', path: '/prompts', color: 'bg-amber-500/10 text-amber-500' },
     { id: 'analysis', enabled: isAnalysisEnabled, label: '통계 분석', icon: BarChart3, description: '데이터 분석 결과를 확인합니다', path: '/analysis', color: 'bg-purple-500/10 text-purple-500' },
