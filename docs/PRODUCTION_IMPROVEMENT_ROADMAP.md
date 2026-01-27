@@ -1,9 +1,9 @@
 # OneRAG 프로덕션 개선 로드맵
 
-> **문서 버전**: 1.1.0
+> **문서 버전**: 1.2.0
 > **작성 일자**: 2026-01-23
-> **최종 업데이트**: 2026-01-23 (Phase 1, 2 완료)
-> **대상 버전**: OneRAG v1.2.1 → v1.3.0
+> **최종 업데이트**: 2026-01-27 (Phase 5 추가)
+> **대상 버전**: OneRAG v1.2.1 → v1.4.0
 
 ---
 
@@ -31,6 +31,11 @@
 │  ├── Chat API Rate Limit 개선                                               │
 │  ├── 모니터링 강화                                                          │
 │  └── API Key 로테이션                                                       │
+│                                                                             │
+│  Phase 5: 검색 품질 개선 (P4)               [1주]      ━━━━━━━━━━━━━━━━━━━  │
+│  ├── TXT 파일 제한 동적화                                                   │
+│  ├── 스트리밍 에러 복구                                                     │
+│  └── 점수 정규화 통합                                                       │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -556,6 +561,165 @@ class APIKeyManager:
 
 ---
 
+## Phase 5: 검색 품질 개선 (P4) - 1주
+
+### 예상 소요 시간: 1주
+
+### 5.1 TXT 파일 제한 동적화
+
+**문제점**
+- 현재 `orchestrator.py`에서 TXT 파일을 최대 15개로 하드코딩
+- 대량의 FAQ/문서 모음이 있는 경우 검색 다양성 저하
+
+**현재 코드** (`app/modules/core/retrieval/orchestrator.py`):
+```python
+def _apply_txt_limit(self, results: list) -> list:
+    txt_limit = 15  # 하드코딩된 값
+    # TXT 파일만 15개로 제한
+```
+
+**해결 방안**:
+```yaml
+# app/config/features/retrieval.yaml
+retrieval:
+  file_type_limits:
+    enabled: true
+    limits:
+      txt: 30    # TXT 파일 최대 30개
+      pdf: 20    # PDF 파일 최대 20개
+      docx: 15   # DOCX 파일 최대 15개
+    default: 10  # 기타 파일 타입
+```
+
+```python
+# orchestrator.py 수정
+def _apply_file_type_limit(self, results: list) -> list:
+    limits = self.config.get("file_type_limits", {})
+    if not limits.get("enabled", False):
+        return results
+
+    file_type_limits = limits.get("limits", {})
+    default_limit = limits.get("default", 10)
+
+    # 파일 타입별로 그룹화하여 제한 적용
+    ...
+```
+
+**영향도**: 검색 다양성 ↑, 답변 품질 ↑
+
+---
+
+### 5.2 스트리밍 에러 복구 메커니즘
+
+**문제점**
+- `stream_rag_pipeline()` 실행 중 에러 발생 시 이미 전송된 청크 손실
+- 사용자는 부분적인 답변만 받고 갑자기 연결 종료됨
+
+**현재 코드** (`app/api/services/chat_service.py`):
+```python
+async def stream_rag_pipeline(...) -> AsyncGenerator:
+    try:
+        async for text_chunk in generation_module.stream_answer(...):
+            yield {"event": "chunk", "data": text_chunk, ...}
+    except Exception as e:
+        # 에러 발생 시 버퍼링된 청크는 클라이언트에 도달 못함
+        yield {"event": "error", "message": "..."}
+```
+
+**해결 방안**: 체크포인트 기반 복구
+```python
+async def stream_rag_pipeline(...) -> AsyncGenerator:
+    checkpoint_interval = 5  # 5개 청크마다 체크포인트
+    accumulated_text = ""
+
+    try:
+        async for text_chunk in generation_module.stream_answer(...):
+            accumulated_text += text_chunk
+            chunk_index += 1
+
+            yield {"event": "chunk", "data": text_chunk, "index": chunk_index}
+
+            # 체크포인트 이벤트 전송
+            if chunk_index % checkpoint_interval == 0:
+                yield {
+                    "event": "checkpoint",
+                    "chunk_index": chunk_index,
+                    "accumulated_length": len(accumulated_text)
+                }
+    except Exception as e:
+        # 에러 발생 시에도 마지막 체크포인트 정보 전송
+        yield {
+            "event": "error",
+            "message": str(e),
+            "last_checkpoint": chunk_index - (chunk_index % checkpoint_interval),
+            "partial_text_length": len(accumulated_text)
+        }
+```
+
+**영향도**: 사용자 경험 ↑, 부분 답변 복구 가능
+
+---
+
+### 5.3 점수 정규화 및 가중 합산
+
+**문제점**
+- 벡터 점수(0~1)와 리랭크 점수(0~100) 범위가 다름
+- 리랭킹 후 순위가 불안정하게 변경됨
+
+**현재 코드**:
+```python
+# 벡터 점수: 0~1 범위
+search_results = await self.retriever.search(query, top_k)
+# result.metadata["score"] = 0.85
+
+# 리랭크 점수: 0~100 범위 (정규화 없이 혼용)
+reranked = await self.reranker.rerank(query, search_results)
+# result.metadata["rerank_score"] = 78
+```
+
+**해결 방안**: 정규화 후 가중 합산
+```yaml
+# app/config/features/retrieval.yaml
+retrieval:
+  score_fusion:
+    enabled: true
+    vector_weight: 0.6      # 벡터 점수 가중치 60%
+    rerank_weight: 0.4      # 리랭크 점수 가중치 40%
+    normalize_rerank: true  # 리랭크 점수 0~1 정규화
+```
+
+```python
+def _fuse_scores(self, results: list) -> list:
+    """벡터 점수와 리랭크 점수의 가중 합산"""
+    config = self.config.get("score_fusion", {})
+
+    if not config.get("enabled", False):
+        return results
+
+    vector_w = config.get("vector_weight", 0.6)
+    rerank_w = config.get("rerank_weight", 0.4)
+
+    for result in results:
+        vector_score = result.metadata.get("score", 0)
+        rerank_score = result.metadata.get("rerank_score", 0)
+
+        # 리랭크 점수 정규화 (0~100 → 0~1)
+        if config.get("normalize_rerank", True):
+            rerank_score = rerank_score / 100.0
+
+        # 가중 합산
+        result.metadata["final_score"] = (
+            vector_score * vector_w + rerank_score * rerank_w
+        )
+
+    # final_score 기준 재정렬
+    return sorted(results, key=lambda x: x.metadata["final_score"], reverse=True)
+```
+
+**영향도**: 검색 안정성 ↑, 순위 예측 가능성 ↑
+
+---
+
 ## 검증 체크리스트
 
 ### ✅ Phase 1 완료 조건 (2026-01-23 검증 완료)
@@ -585,6 +749,13 @@ class APIKeyManager:
 - [ ] 프로덕션 메트릭 대시보드 구성
 - [ ] API Key 로테이션 테스트 완료
 
+### Phase 5 완료 조건
+
+- [ ] TXT 파일 제한이 YAML 설정으로 동적 조정 가능
+- [ ] 스트리밍 에러 발생 시 체크포인트 이벤트 전송
+- [ ] 벡터/리랭크 점수 정규화 후 가중 합산 적용
+- [ ] 검색 결과 순위 안정성 테스트 통과
+
 ---
 
 ## 버전 계획
@@ -594,9 +765,10 @@ class APIKeyManager:
 | **v1.2.2** | Phase 1, 2 | 보안 패치 (Critical 4개 + High 6개) | ✅ 완료 |
 | **v1.3.0** | Phase 3 | 기능 정상화 + 설정 분리 | 예정 |
 | **v1.3.1** | Phase 4 | 운영 최적화 | 예정 |
+| **v1.4.0** | Phase 5 | 검색 품질 개선 (TXT 제한, 스트리밍 복구, 점수 정규화) | 예정 |
 
 ---
 
 **문서 작성자**: Claude Code (Automated Planning)
-**최종 업데이트**: 2026-01-23 (Phase 1, 2 완료 반영)
+**최종 업데이트**: 2026-01-27 (Phase 5 추가)
 **검토 필요**: Tech Lead, Security Team
