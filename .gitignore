@@ -123,3 +123,8 @@ frontend/node_modules/
 frontend/dist/
 frontend/coverage/
 frontend/.turbo/
+# ===================================
+# Internal Analysis (로컬 전용)
+# ===================================
+analysis-results/
+docs/plans/2026-01-11-opensource-release-prep.md
