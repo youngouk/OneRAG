@@ -1,6 +1,10 @@
-# OneRAG
+<p align="center">
+  <img src="assets/logo.svg" alt="OneRAG Logo" width="320">
+</p>
 
-> **Start in 5 minutes, assemble like building blocks**
+<p align="center">
+  <strong>Start in 5 minutes, assemble like building blocks</strong>
+</p>
 
 [한국어](README.md) | **English**
 

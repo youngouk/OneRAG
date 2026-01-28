@@ -1,6 +1,10 @@
-# OneRAG
+<p align="center">
+  <img src="assets/logo.svg" alt="OneRAG Logo" width="320">
+</p>
 
-> **5분 안에 시작하고, 블록처럼 조립하는 RAG 시스템**
+<p align="center">
+  <strong>5분 안에 시작하고, 블록처럼 조립하는 RAG 시스템</strong>
+</p>
 
 **한국어** | [English](README_EN.md)
 
