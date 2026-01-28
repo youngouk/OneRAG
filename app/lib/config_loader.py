@@ -1,5 +1,5 @@
 """
-Configuration loader for RAG Chatbot
+Configuration loader for OneRAG
 YAML 기반 계층적 설정 로더 + Pydantic 검증
 
 v3.1.0 개선사항:

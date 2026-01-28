@@ -1,6 +1,6 @@
 """
-RAG Chatbot FastAPI Application
-한국어 RAG 챗봇 시스템의 메인 애플리케이션
+OneRAG FastAPI Application
+한국어 RAG 시스템의 메인 애플리케이션
 """
 
 import asyncio
@@ -215,7 +215,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     # 시작 시
     try:
-        logger.info("🚀 Starting RAG Chatbot Application...")
+        logger.info("🚀 Starting OneRAG Application...")
 
         # NOTE: Legacy Batch Crawler startup logic removed (Moved to Ingestion API)
         # See app/api/ingest.py for new usage.
@@ -410,8 +410,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 # FastAPI 앱 생성
 app = FastAPI(
-    title="RAG Chatbot API",
-    description="RAG 챗봇 시스템 - API Key 인증 필요",
+    title="OneRAG API",
+    description="OneRAG 시스템 - API Key 인증 필요",
     version="2.0.0",
     lifespan=lifespan,
 )
@@ -621,9 +621,9 @@ async def api_info() -> dict[str, Any]:
             modules_status[module_name] = "활성화" if module else "비활성화"
 
     return {
-        "name": "RAG Chatbot API",
+        "name": "OneRAG API",
         "version": "2.0.0",
-        "description": "RAG 챗봇 시스템",
+        "description": "OneRAG 시스템",
         "status": "운영 중",
         "modules": modules_status,
         "features": [

@@ -1,5 +1,5 @@
 """
-DI Container - Dependency Injection Container for RAG Chatbot
+DI Container - Dependency Injection Container for OneRAG
 
 TASK-H3: main.py 660줄 → 250줄 리팩토링
 dependency-injector 라이브러리 기반 DI Container

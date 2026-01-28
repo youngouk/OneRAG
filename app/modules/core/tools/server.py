@@ -207,7 +207,7 @@ class ToolServer:
 
             self._fastmcp = FastMCP(
                 name=self.server_name,
-                description="RAG Chatbot Tool Server",
+                description="OneRAG Tool Server",
             )
             logger.debug("FastMCP 인스턴스 생성됨")
         except ImportError:

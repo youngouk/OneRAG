@@ -3,7 +3,7 @@
 # 사용: 모든 feature 설정 파일을 imports 섹션에 명시
 
 app:
-  name: "Enhanced RAG Chatbot"
+  name: "OneRAG"
   version: "3.0.0"
   debug: false
 

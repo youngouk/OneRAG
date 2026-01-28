@@ -1,4 +1,4 @@
-# Pre-commit hooks for RAG Chatbot
+# Pre-commit hooks for OneRAG
 # 설치: uv run pre-commit install
 # 수동 실행: uv run pre-commit run --all-files
 

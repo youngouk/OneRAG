@@ -1,5 +1,5 @@
 """
-Models package for RAG Chatbot
+Models package for OneRAG
 프롬프트 및 평가 시스템 데이터 모델 정의
 """
 

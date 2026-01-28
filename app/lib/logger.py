@@ -1,5 +1,5 @@
 """
-Structured logging for RAG Chatbot
+Structured logging for OneRAG
 구조화된 로깅 시스템
 """
 
