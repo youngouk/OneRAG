@@ -4,6 +4,40 @@
 
 ---
 
+## [v1.2.1] - 2026-01-20
+
+### Added
+- **Reranker 확장**: Cohere (100+ 언어), Local (sentence-transformers), OpenRouter 추가
+- `RerankerFactoryV2`: 4 approach × 6 provider 3단계 계층 구조
+- `reranking.yaml` v2.1 설정 포맷
+
+---
+
+## [v1.0.9] - 2026-01-18
+
+### Added
+- **WebSocket API**: 양방향 실시간 채팅 (`/chat-ws`)
+- 6종 메시지 타입: `message`, `stream_start`, `stream_token`, `stream_sources`, `stream_end`, `stream_error`
+- RAG 파이프라인 통합 (`ChatService.stream_rag_pipeline()` 재사용)
+
+### Documentation
+- `docs/websocket-api-guide.md` 작성
+
+---
+
+## [v1.0.8] - 2026-01-15
+
+### Added
+- **Streaming API**: SSE 기반 실시간 응답 (`POST /chat/stream`)
+- 4종 이벤트 타입: `metadata`, `chunk`, `done`, `error`
+- Multi-LLM 스트리밍 지원 (Google Gemini, OpenAI GPT, Anthropic Claude)
+- Rate Limit: 100회/15분
+
+### Documentation
+- `docs/streaming-api-guide.md` 작성
+
+---
+
 ## [v1.0.7] - 2026-01-10
 
 ### Changed

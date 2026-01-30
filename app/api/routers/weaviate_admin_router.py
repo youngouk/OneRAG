@@ -8,15 +8,20 @@ Railway 배포 환경에서 Weaviate 상태 확인 및 데이터 인덱싱을 �
 - POST /api/admin/weaviate/index: 전체 데이터 수동 인덱싱
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
+from app.lib.auth import get_api_key
 from app.lib.logger import get_logger
 from app.lib.weaviate_client import get_weaviate_client
 
 logger = get_logger(__name__)
 
-router = APIRouter(prefix="/api/admin/weaviate", tags=["Weaviate Admin"])
+router = APIRouter(
+    prefix="/api/admin/weaviate",
+    tags=["Weaviate Admin"],
+    dependencies=[Depends(get_api_key)],
+)
 
 
 @router.get("/status")

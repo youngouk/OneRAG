@@ -291,7 +291,7 @@ async def chat(request: Request, chat_request: ChatRequest) -> ChatResponse:
         wrapped_error = wrap_exception(
             e,
             default_message="요청 처리 중 오류가 발생했습니다",
-            error_code=ErrorCode.UNKNOWN_ERROR,
+            error_code=ErrorCode.GENERAL_001,
             context={
                 "session_id": session_id,
                 "endpoint": "/api/chat",

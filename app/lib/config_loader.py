@@ -238,7 +238,7 @@ class ConfigLoader:
             "GOOGLE_API_KEY": ("llm", "google", "api_key"),
             "OPENAI_API_KEY": ("llm", "openai", "api_key"),
             "ANTHROPIC_API_KEY": ("llm", "anthropic", "api_key"),
-            "COHERE_API_KEY": ("reranking", "providers", "cohere", "api_key"),
+            "COHERE_API_KEY": ("reranking", "cohere", "api_key"),
             "REDIS_URL": ("session", "redis_url"),
             "LOG_LEVEL": ("logging", "level"),
             # MongoDB 환경 변수 매핑 (통합 테스트 지원)

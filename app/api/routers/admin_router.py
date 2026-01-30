@@ -10,8 +10,9 @@ Phase 3: 배치 평가 API
 - 에러 핸들링
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from ...lib.auth import get_api_key
 from ...lib.logger import get_logger
 from ...modules.core.evaluation import EvaluatorFactory
 from ..schemas.debug import DebugTrace
@@ -22,7 +23,7 @@ from ..schemas.evaluation import (
 )
 
 logger = get_logger(__name__)
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(prefix="/admin", tags=["Admin"], dependencies=[Depends(get_api_key)])
 
 # 설정 및 모듈 (DI Container에서 주입받을 수 있도록 변수화)
 _config: dict | None = None

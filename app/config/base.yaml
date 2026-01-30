@@ -4,7 +4,7 @@
 
 app:
   name: "OneRAG"
-  version: "3.0.0"
+  version: "1.0.7"
   debug: false
 
 server:
@@ -36,6 +36,5 @@ imports:
   - features/llm.yaml             # 하위 호환성 유지 (추후 제거 예정)
   - features/circuit_breaker.yaml # Circuit Breaker 설정 (MVP: 비활성화)
   - features/sql_search.yaml      # SQL 검색 설정 (Phase 3: 메타데이터 검색)
-  - features/mcp.yaml             # MCP 도구 설정 (Model Context Protocol)
   - features/graph_rag.yaml       # GraphRAG 지식 그래프 검색 (GraphRAGFactory 지원)
   - features/evaluation.yaml      # 평가 시스템 (EvaluatorFactory 지원)

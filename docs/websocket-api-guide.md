@@ -796,7 +796,7 @@ WebSocket API는 다음과 같은 에러 코드를 반환할 수 있습니다.
 | `GEN-001` ~ `GEN-999` | LLM 생성 관련 에러 | 에러 메시지 및 solutions 참고 |
 | `SEARCH-001` ~ `SEARCH-999` | 검색 관련 에러 | 에러 메시지 및 solutions 참고 |
 
-전체 에러 코드는 [에러 시스템 가이드](./error-system-guide.md)를 참고하세요.
+전체 에러 코드는 [에러 시스템 가이드](../CLAUDE.md#4-에러-시스템-v20-bilingual)를 참고하세요.
 
 ### 재연결 전략
 
@@ -1273,5 +1273,5 @@ class ConnectionManager:
 
 - [Streaming API 사용 가이드](./streaming-api-guide.md) - SSE 기반 스트리밍 API
 - [CLAUDE.md](../CLAUDE.md) - 프로젝트 개요
-- [API Reference](./api-reference.md) - 전체 API 문서
-- [에러 시스템 가이드](./error-system-guide.md) - ErrorCode 설명
+- [API Reference](./API_REFERENCE.md) - 전체 API 문서
+- [에러 시스템 가이드](../CLAUDE.md#4-에러-시스템-v20-bilingual) - ErrorCode 설명

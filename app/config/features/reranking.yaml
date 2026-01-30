@@ -25,7 +25,7 @@ reranking:
   # 기본 설정
   # ========================================
   approach: "late-interaction"  # llm | cross-encoder | late-interaction | local
-  default_provider: "jina"      # approach에 따라 유효한 provider 선택
+  provider: "jina"              # approach에 따라 유효한 provider 선택
 
   # ========================================
   # Provider별 설정

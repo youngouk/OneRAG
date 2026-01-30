@@ -470,5 +470,5 @@ location /api/chat/stream {
 ## 관련 문서
 
 - [CLAUDE.md](../CLAUDE.md) - 프로젝트 개요
-- [API Reference](./api-reference.md) - 전체 API 문서
-- [에러 시스템 가이드](./error-system-guide.md) - ErrorCode 설명
+- [API Reference](./API_REFERENCE.md) - 전체 API 문서
+- [에러 시스템 가이드](../CLAUDE.md#4-에러-시스템-v20-bilingual) - ErrorCode 설명
