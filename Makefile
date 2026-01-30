@@ -55,6 +55,12 @@ help:
 	@echo "  frontend-lint    - 프론트엔드 린트 검사"
 	@echo "  frontend-test    - 프론트엔드 테스트"
 	@echo ""
+	@echo "🏠 Docker-Free 로컬 퀵스타트 (Docker 불필요!):"
+	@echo "  quickstart-local      - Docker 없이 원클릭 실행 (ChromaDB + BM25)"
+	@echo "  quickstart-local-load - ChromaDB 샘플 데이터 로드"
+	@echo "  quickstart-local-chat - CLI 챗봇 실행"
+	@echo "  quickstart-local-clean- 로컬 퀵스타트 데이터 삭제"
+	@echo ""
 	@echo "🔗 Fullstack (Frontend + Backend + Weaviate):"
 	@echo "  fullstack       - 전체 스택 Docker Compose 실행"
 	@echo "  fullstack-down  - Fullstack 서비스 종료"
@@ -305,6 +311,32 @@ quickstart-logs:
 quickstart-load:
 	@echo "📥 샘플 데이터 로드 중..."
 	uv run python quickstart/load_sample_data.py
+
+# =============================================================================
+# Docker-Free 로컬 퀵스타트 (ChromaDB + BM25 하이브리드)
+# =============================================================================
+
+# Docker-Free 원클릭 실행
+quickstart-local: check-uv check-env
+	@echo "🚀 Docker-Free 로컬 퀵스타트 시작..."
+	uv run python quickstart_local/run.py
+
+# 로컬 퀵스타트 데이터만 로드
+quickstart-local-load: check-uv
+	@echo "📥 ChromaDB 샘플 데이터 로드 중..."
+	uv run python quickstart_local/load_data.py
+
+# 로컬 퀵스타트 CLI 챗봇만 실행
+quickstart-local-chat: check-uv
+	@echo "💬 CLI 챗봇 실행..."
+	uv run python quickstart_local/chat.py
+
+# 로컬 퀵스타트 데이터 초기화
+quickstart-local-clean:
+	@echo "🗑️  로컬 퀵스타트 데이터 삭제 중..."
+	rm -rf quickstart_local/.chroma_data
+	rm -f quickstart_local/.bm25_index.pkl
+	@echo "✅ 초기화 완료"
 
 # =============================================================================
 # Frontend 명령 (React 프론트엔드)
