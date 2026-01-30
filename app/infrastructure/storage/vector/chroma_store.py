@@ -101,7 +101,10 @@ class ChromaVectorStore(IVectorStore):
 
         def _add_sync() -> int:
             # 컬렉션 가져오기 (없으면 생성)
-            col = self._client.get_or_create_collection(name=collection)
+            col = self._client.get_or_create_collection(
+                name=collection,
+                metadata={"hnsw:space": "cosine"},
+            )
 
             # 문서 데이터 분리
             ids: list[str] = []

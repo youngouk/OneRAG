@@ -384,14 +384,19 @@ async def chat_loop() -> None:
         )
         result_table.add_column("#", style="dim", width=3, justify="right")
         result_table.add_column("내용", ratio=5)
-        result_table.add_column("점수", style="cyan", width=6, justify="right")
+        result_table.add_column("정규화 점수", style="cyan", width=10, justify="right")
 
-        for i, r in enumerate(results[:5], 1):
-            score = r.get("score", 0.0)
+        # 점수 정규화: 최고 점수를 1.0 기준으로 스케일링
+        display_results = results[:5]
+        max_score = max((r.get("score", 0.0) for r in display_results), default=0.0)
+
+        for i, r in enumerate(display_results, 1):
+            raw_score = r.get("score", 0.0)
+            normalized = raw_score / max_score if max_score > 0 else 0.0
             content = r.get("content", "")
             # 첫 줄만 표시 (제목 역할)
             first_line = content.split("\n")[0][:80]
-            result_table.add_row(str(i), first_line, f"{score:.2f}")
+            result_table.add_row(str(i), first_line, f"{normalized:.2f}")
 
         console.print(result_table)
 
