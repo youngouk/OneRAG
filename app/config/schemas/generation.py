@@ -37,9 +37,9 @@ class GenerationConfig(BaseConfig):
 
     max_tokens: int = Field(
         default=2048,
-        ge=100,
-        le=32000,
-        description="최대 생성 토큰 수 (100-32000)",
+        ge=1,
+        le=128000,
+        description="최대 생성 토큰 수 (1-128000)",
     )
 
     # 프롬프트 설정

@@ -80,6 +80,87 @@ class TestBM25ConfigAndPrivacyConfig:
         assert PrivacyConfig is not None
 
 
+class TestGenerationConfigMaxTokens:
+    """GenerationConfig max_tokens 범위 통일 테스트 (3-4)"""
+
+    def test_max_tokens_minimum_is_1(self) -> None:
+        """max_tokens 최소값이 1이어야 함 (기존 100에서 변경)"""
+        from app.config.schemas.generation import GenerationConfig
+
+        config = GenerationConfig(max_tokens=1)
+        assert config.max_tokens == 1
+
+    def test_max_tokens_maximum_is_128000(self) -> None:
+        """max_tokens 최대값이 128000이어야 함 (기존 32000에서 변경)"""
+        from app.config.schemas.generation import GenerationConfig
+
+        config = GenerationConfig(max_tokens=128000)
+        assert config.max_tokens == 128000
+
+    def test_max_tokens_rejects_zero(self) -> None:
+        """max_tokens=0 거부"""
+        import pytest
+        from pydantic import ValidationError
+
+        from app.config.schemas.generation import GenerationConfig
+
+        with pytest.raises(ValidationError):
+            GenerationConfig(max_tokens=0)
+
+    def test_max_tokens_rejects_negative(self) -> None:
+        """max_tokens 음수 거부"""
+        import pytest
+        from pydantic import ValidationError
+
+        from app.config.schemas.generation import GenerationConfig
+
+        with pytest.raises(ValidationError):
+            GenerationConfig(max_tokens=-1)
+
+    def test_max_tokens_rejects_over_128000(self) -> None:
+        """max_tokens 128001 이상 거부"""
+        import pytest
+        from pydantic import ValidationError
+
+        from app.config.schemas.generation import GenerationConfig
+
+        with pytest.raises(ValidationError):
+            GenerationConfig(max_tokens=128001)
+
+    def test_max_tokens_default_unchanged(self) -> None:
+        """기본값 2048 유지 확인"""
+        from app.config.schemas.generation import GenerationConfig
+
+        config = GenerationConfig()
+        assert config.max_tokens == 2048
+
+    def test_max_tokens_matches_llm_provider_settings(self) -> None:
+        """GenerationConfig와 LLMProviderSettings의 max_tokens 범위 일치 확인"""
+        from app.config.schemas.generation import GenerationConfig
+        from app.lib.config_validator import LLMProviderSettings
+
+        gen_field = GenerationConfig.model_fields["max_tokens"]
+        llm_field = LLMProviderSettings.model_fields["max_tokens"]
+
+        # metadata에서 ge/le 값 추출 (별도 객체로 저장됨)
+        def extract_constraint(field_info, attr: str) -> int | None:  # type: ignore[no-untyped-def]
+            """Pydantic FieldInfo metadata에서 ge/le 제약조건 추출"""
+            for m in field_info.metadata:
+                if hasattr(m, attr):
+                    return getattr(m, attr)  # type: ignore[no-any-return]
+            return None
+
+        # ge (최소값) 일치
+        gen_ge = extract_constraint(gen_field, "ge")
+        llm_ge = extract_constraint(llm_field, "ge")
+        assert gen_ge == llm_ge, f"최소값 불일치: GenerationConfig={gen_ge}, LLMProviderSettings={llm_ge}"
+
+        # le (최대값) 일치
+        gen_le = extract_constraint(gen_field, "le")
+        llm_le = extract_constraint(llm_field, "le")
+        assert gen_le == llm_le, f"최대값 불일치: GenerationConfig={gen_le}, LLMProviderSettings={llm_le}"
+
+
 class TestSchemasPackageExports:
     """schemas 패키지 __all__ export 테스트"""
 
