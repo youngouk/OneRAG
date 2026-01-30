@@ -77,8 +77,8 @@ _DEFAULT_PROVIDERS: dict[str, RetrieverProviderInfo] = {
     },
     "chroma": {
         "class_path": "app.modules.core.retrieval.retrievers.chroma_retriever.ChromaRetriever",
-        "hybrid_support": False,
-        "description": "Chroma Dense 전용 Retriever - 벡터 검색만 지원 (하이브리드 미지원)",
+        "hybrid_support": True,
+        "description": "Chroma 하이브리드 Retriever - Dense + BM25 검색 지원 (BM25 엔진 필요)",
     },
     "pinecone": {
         "class_path": "app.modules.core.retrieval.retrievers.pinecone_retriever.PineconeRetriever",

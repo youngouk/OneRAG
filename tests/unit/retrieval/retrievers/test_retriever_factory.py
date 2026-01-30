@@ -231,6 +231,59 @@ class TestRetrieverFactoryProviderInfo:
         assert info is None
 
 
+class TestRetrieverFactoryBM25EngineIntegration:
+    """BM25 엔진 DI 주입 관련 RetrieverFactory 테스트"""
+
+    def test_chroma_hybrid_support_flag(self):
+        """
+        Chroma provider의 hybrid_support가 True로 설정되어 있는지 확인
+
+        Given: RetrieverFactory에 chroma provider가 등록됨
+        When: supports_hybrid("chroma") 호출
+        Then: True 반환 (BM25 엔진 DI 주입으로 하이브리드 지원)
+        """
+        from app.modules.core.retrieval.retrievers.factory import RetrieverFactory
+
+        assert RetrieverFactory.supports_hybrid("chroma") is True
+
+    def test_chroma_create_with_bm25_engine(self):
+        """
+        Chroma Retriever를 BM25 엔진(bm25_index, hybrid_merger)과 함께 생성
+
+        Given: Mock embedder, store, bm25_index, hybrid_merger
+        When: RetrieverFactory.create()에 bm25_preprocessors로 전달
+        Then: ChromaRetriever 인스턴스에 BM25 엔진 주입됨
+        """
+        from app.modules.core.retrieval.retrievers.factory import RetrieverFactory
+
+        mock_embedder = MockEmbedder()
+        mock_store = MagicMock()
+        mock_bm25_index = MagicMock()
+        mock_hybrid_merger = MagicMock()
+
+        config = {
+            "store": mock_store,
+            "collection_name": "TestDocs",
+        }
+
+        bm25_preprocessors = {
+            "bm25_index": mock_bm25_index,
+            "hybrid_merger": mock_hybrid_merger,
+        }
+
+        retriever = RetrieverFactory.create(
+            provider="chroma",
+            embedder=mock_embedder,
+            config=config,
+            bm25_preprocessors=bm25_preprocessors,
+        )
+
+        assert retriever is not None
+        assert retriever.__class__.__name__ == "ChromaRetriever"
+        # BM25 엔진이 주입되어 하이브리드 모드 활성화
+        assert retriever._hybrid_enabled is True
+
+
 class TestRetrieverFactoryLazyLoading:
     """지연 로딩 테스트"""
 

@@ -591,8 +591,158 @@ class TestChromaRetrieverProtocolCompliance:
         assert isinstance(results[0], SearchResult)
 
 
-class TestChromaRetrieverNoHybridSupport:
-    """ChromaRetriever 하이브리드 미지원 확인 테스트"""
+class TestChromaRetrieverHybridSearch:
+    """ChromaRetriever 하이브리드 검색 테스트 (BM25Engine DI 주입)"""
+
+    @pytest.fixture
+    def mock_embedder(self) -> MagicMock:
+        """Mock Embedder"""
+        embedder = MagicMock()
+        embedder.embed_query = MagicMock(return_value=[0.1] * 3072)
+        return embedder
+
+    @pytest.fixture
+    def mock_chroma_store_with_results(self) -> MagicMock:
+        """검색 결과를 반환하는 Mock ChromaVectorStore"""
+        store = MagicMock()
+
+        async def mock_search(
+            collection: str,
+            query_vector: list[float],
+            top_k: int,
+            filters: dict[str, Any] | None = None,
+        ) -> list[dict[str, Any]]:
+            return [
+                {
+                    "_id": "doc-1",
+                    "_distance": 0.15,
+                    "content": "테스트 문서 1",
+                    "source": "test1.md",
+                    "file_type": "MARKDOWN",
+                },
+                {
+                    "_id": "doc-2",
+                    "_distance": 0.25,
+                    "content": "테스트 문서 2",
+                    "source": "test2.md",
+                    "file_type": "MARKDOWN",
+                },
+            ]
+
+        store.search = mock_search
+        return store
+
+    @pytest.fixture
+    def mock_bm25_index(self) -> MagicMock:
+        """Mock BM25Index"""
+        bm25_index = MagicMock()
+        bm25_index.search = MagicMock(return_value=[
+            {"id": "doc-2", "content": "테스트 문서 2", "score": 0.9, "metadata": {}},
+            {"id": "doc-3", "content": "테스트 문서 3", "score": 0.7, "metadata": {}},
+        ])
+        return bm25_index
+
+    @pytest.fixture
+    def mock_hybrid_merger(self) -> MagicMock:
+        """Mock HybridMerger"""
+        from app.modules.core.retrieval.interfaces import SearchResult
+
+        merger = MagicMock()
+        merger.merge = MagicMock(return_value=[
+            SearchResult(id="doc-2", content="테스트 문서 2", score=0.95, metadata={}),
+            SearchResult(id="doc-1", content="테스트 문서 1", score=0.85, metadata={}),
+            SearchResult(id="doc-3", content="테스트 문서 3", score=0.70, metadata={}),
+        ])
+        return merger
+
+    def test_init_with_bm25_engine(
+        self,
+        mock_embedder: MagicMock,
+        mock_chroma_store_with_results: MagicMock,
+        mock_bm25_index: MagicMock,
+        mock_hybrid_merger: MagicMock,
+    ) -> None:
+        """
+        BM25 엔진과 함께 초기화
+
+        Given: bm25_index와 hybrid_merger가 주입됨
+        When: ChromaRetriever 생성
+        Then: 하이브리드 검색 모드로 초기화
+        """
+        from app.modules.core.retrieval.retrievers.chroma_retriever import ChromaRetriever
+
+        retriever = ChromaRetriever(
+            embedder=mock_embedder,
+            store=mock_chroma_store_with_results,
+            bm25_index=mock_bm25_index,
+            hybrid_merger=mock_hybrid_merger,
+        )
+
+        assert retriever.embedder == mock_embedder
+        assert retriever.store == mock_chroma_store_with_results
+
+    @pytest.mark.asyncio
+    async def test_hybrid_search_calls_both_sources(
+        self,
+        mock_embedder: MagicMock,
+        mock_chroma_store_with_results: MagicMock,
+        mock_bm25_index: MagicMock,
+        mock_hybrid_merger: MagicMock,
+    ) -> None:
+        """
+        하이브리드 검색 시 Dense + BM25 양쪽 호출
+
+        Given: bm25_index와 hybrid_merger가 주입된 retriever
+        When: search() 호출
+        Then: Dense 검색 + BM25 검색 + Merger 병합 모두 수행
+        """
+        from app.modules.core.retrieval.retrievers.chroma_retriever import ChromaRetriever
+
+        retriever = ChromaRetriever(
+            embedder=mock_embedder,
+            store=mock_chroma_store_with_results,
+            bm25_index=mock_bm25_index,
+            hybrid_merger=mock_hybrid_merger,
+        )
+
+        results = await retriever.search(query="테스트 쿼리", top_k=5)
+
+        # 검증: BM25 검색이 호출됨
+        mock_bm25_index.search.assert_called_once()
+        # 검증: HybridMerger가 호출됨
+        mock_hybrid_merger.merge.assert_called_once()
+        # 검증: 병합된 결과 반환
+        assert len(results) == 3
+
+    @pytest.mark.asyncio
+    async def test_without_bm25_falls_back_to_dense(
+        self,
+        mock_embedder: MagicMock,
+        mock_chroma_store_with_results: MagicMock,
+    ) -> None:
+        """
+        BM25 엔진 없이 기존 Dense 전용 동작
+
+        Given: bm25_index가 None인 retriever
+        When: search() 호출
+        Then: 기존 Dense 전용 검색 수행 (하위 호환성)
+        """
+        from app.modules.core.retrieval.retrievers.chroma_retriever import ChromaRetriever
+
+        retriever = ChromaRetriever(
+            embedder=mock_embedder,
+            store=mock_chroma_store_with_results,
+        )
+
+        results = await retriever.search(query="테스트 쿼리", top_k=5)
+
+        # 검증: Dense 결과만 반환 (기존 동작 유지)
+        assert len(results) == 2
+        assert results[0].id == "doc-1"
+
+
+class TestChromaRetrieverBM25ParameterStructure:
+    """ChromaRetriever BM25 파라미터 구조 확인 테스트"""
 
     @pytest.fixture
     def mock_embedder(self) -> MagicMock:
@@ -615,15 +765,15 @@ class TestChromaRetrieverNoHybridSupport:
         store.search = mock_search
         return store
 
-    def test_no_bm25_parameters(
+    def test_bm25_params_are_optional(
         self, mock_embedder: MagicMock, mock_chroma_store: MagicMock
     ) -> None:
         """
-        BM25 관련 파라미터가 없는지 확인
+        BM25 파라미터가 선택적인지 확인
 
         Given: ChromaRetriever 생성자
         When: __init__ 시그니처 확인
-        Then: bm25_preprocessors, synonym_manager, stopword_filter 등 없음
+        Then: bm25_index, hybrid_merger는 있지만 기본값 None
         """
         import inspect
 
@@ -631,18 +781,16 @@ class TestChromaRetrieverNoHybridSupport:
             ChromaRetriever,
         )
 
-        # __init__ 시그니처 확인
         sig = inspect.signature(ChromaRetriever.__init__)
-        param_names = list(sig.parameters.keys())
+        params = sig.parameters
 
-        # BM25 관련 파라미터가 없어야 함
-        bm25_params = [
-            "synonym_manager",
-            "stopword_filter",
-            "user_dictionary",
-            "bm25_preprocessors",
-            "alpha",  # 하이브리드 가중치
-        ]
+        # bm25_index와 hybrid_merger는 존재하되 기본값이 None
+        assert "bm25_index" in params
+        assert params["bm25_index"].default is None
+        assert "hybrid_merger" in params
+        assert params["hybrid_merger"].default is None
 
-        for param in bm25_params:
-            assert param not in param_names, f"{param}은 ChromaRetriever에 있으면 안 됨"
+        # 기존 전처리 모듈 파라미터는 없어야 함 (DI 컨테이너에서 처리)
+        legacy_params = ["synonym_manager", "stopword_filter", "user_dictionary"]
+        for param in legacy_params:
+            assert param not in params, f"{param}은 ChromaRetriever에 있으면 안 됨"

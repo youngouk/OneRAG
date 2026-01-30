@@ -135,6 +135,9 @@ all-vectordb = [
     "pgvector>=0.2.0",
 ]
 
+# BM25 엔진 (Phase 1: Dense 전용 DB의 하이브리드 검색 지원)
+bm25 = ["kiwipiepy>=0.18.0", "rank-bm25>=0.2.2"]
+
 [project.scripts]
 rag-chatbot = "main:main"
 

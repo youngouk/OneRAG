@@ -1267,11 +1267,51 @@ def create_retriever_via_factory(
     # BM25 전처리 모듈 (하이브리드 지원 provider용)
     bm25_preprocessors: dict[str, Any] | None = None
     if RetrieverFactory.supports_hybrid(provider):
-        bm25_preprocessors = {
-            "synonym_manager": synonym_manager,
-            "stopword_filter": stopword_filter,
-            "user_dictionary": user_dictionary,
-        }
+        if provider == "weaviate":
+            # Weaviate는 기존 전처리 모듈만 주입 (BM25 실행은 Weaviate 내장)
+            bm25_preprocessors = {
+                "synonym_manager": synonym_manager,
+                "stopword_filter": stopword_filter,
+                "user_dictionary": user_dictionary,
+            }
+        elif provider in ("chroma", "pgvector", "mongodb"):
+            # Dense 전용 DB는 BM25 엔진 주입 (선택적)
+            try:
+                from app.modules.core.retrieval.bm25_engine import (
+                    BM25Index,
+                    HybridMerger,
+                    KoreanTokenizer,
+                )
+
+                tokenizer = KoreanTokenizer(
+                    stopword_filter=stopword_filter,
+                    synonym_manager=synonym_manager,
+                    user_dictionary=user_dictionary,
+                )
+                bm25_index = BM25Index(tokenizer=tokenizer)
+                hybrid_merger = HybridMerger(
+                    alpha=config.get("hybrid_search", {}).get("default_alpha", 0.6)
+                )
+
+                bm25_preprocessors = {
+                    "bm25_index": bm25_index,
+                    "hybrid_merger": hybrid_merger,
+                }
+                logger.info(f"BM25 엔진 주입 완료 (provider={provider})")
+
+            except ImportError:
+                logger.warning(
+                    f"BM25 엔진 의존성 미설치 - {provider}는 Dense 전용으로 동작합니다. "
+                    "하이브리드 검색을 사용하려면: uv add kiwipiepy rank-bm25"
+                )
+                bm25_preprocessors = None
+        else:
+            # Pinecone, Qdrant 등은 기존 전처리 모듈 주입
+            bm25_preprocessors = {
+                "synonym_manager": synonym_manager,
+                "stopword_filter": stopword_filter,
+                "user_dictionary": user_dictionary,
+            }
 
     if provider == "weaviate":
         # Weaviate: weaviate_client 사용 (store 대신)

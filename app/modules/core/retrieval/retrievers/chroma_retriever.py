@@ -1,21 +1,18 @@
 """
-Chroma Retriever - Dense 전용 벡터 검색
+Chroma Retriever - Dense 및 하이브리드 벡터 검색
 
 주요 기능:
 - IRetriever 인터페이스 구현
-- Dense 벡터 검색만 지원 (하이브리드 검색 미지원)
+- Dense 벡터 검색 기본 지원
+- BM25 엔진 DI 주입 시 하이브리드 검색 지원 (Phase 1)
 - ChromaVectorStore를 통한 검색 수행
-- 쿼리 벡터화 → 유사도 검색 → SearchResult 변환
+- 쿼리 벡터화 → 유사도 검색 → (선택) BM25 병합 → SearchResult 변환
 
 의존성:
 - chromadb: pip install chromadb
 - app.infrastructure.storage.vector.chroma_store: ChromaVectorStore
 - app.modules.core.retrieval.interfaces: IRetriever, SearchResult
-
-Note:
-    Chroma는 하이브리드 검색(BM25)을 지원하지 않습니다.
-    Dense 검색만 필요한 경우 사용하세요.
-    하이브리드 검색이 필요하면 WeaviateRetriever를 사용하세요.
+- (선택) kiwipiepy, rank-bm25: 하이브리드 검색 시 필요
 """
 
 from typing import Any, Protocol, runtime_checkable
@@ -52,21 +49,23 @@ class IVectorStore(Protocol):
 
 class ChromaRetriever:
     """
-    Chroma 벡터 DB를 사용하는 Dense 전용 Retriever
+    Chroma 벡터 DB를 사용하는 Retriever (Dense + 선택적 하이브리드)
 
     특징:
-    - Dense 벡터 검색만 지원 (하이브리드 검색 미지원)
+    - Dense 벡터 검색 기본 지원
+    - BM25 엔진 DI 주입 시 하이브리드 검색 자동 활성화
     - ChromaVectorStore를 통한 검색 수행
     - IRetriever Protocol 구현
 
     사용 예시:
+        # Dense 전용 (기본)
+        retriever = ChromaRetriever(embedder=embedder, store=store)
+
+        # 하이브리드 검색 (BM25 엔진 DI 주입)
         retriever = ChromaRetriever(
-            embedder=gemini_embedder,
-            store=chroma_store,
-            collection_name="documents",
-            top_k=10,
+            embedder=embedder, store=store,
+            bm25_index=bm25_index, hybrid_merger=merger,
         )
-        results = await retriever.search("검색 쿼리")
     """
 
     def __init__(
@@ -75,6 +74,9 @@ class ChromaRetriever:
         store: IVectorStore,
         collection_name: str = "documents",
         top_k: int = 10,
+        # Phase 1: BM25 엔진 DI 주입 (선택적)
+        bm25_index: Any | None = None,
+        hybrid_merger: Any | None = None,
     ) -> None:
         """
         ChromaRetriever 초기화
@@ -84,15 +86,18 @@ class ChromaRetriever:
             store: ChromaVectorStore 인스턴스 (IVectorStore)
             collection_name: Chroma 컬렉션 이름 (기본값: "documents")
             top_k: 기본 검색 결과 수 (기본값: 10)
-
-        Note:
-            Chroma는 하이브리드 검색을 지원하지 않으므로
-            BM25 관련 파라미터(synonym_manager, stopword_filter 등)는 없습니다.
+            bm25_index: BM25Index 인스턴스 (선택적, DI 주입)
+            hybrid_merger: HybridMerger 인스턴스 (선택적, DI 주입)
         """
         self.embedder = embedder
         self.store = store
         self.collection_name = collection_name
         self.top_k = top_k
+
+        # Phase 1: BM25 엔진 (선택적 DI)
+        self._bm25_index = bm25_index
+        self._hybrid_merger = hybrid_merger
+        self._hybrid_enabled = bm25_index is not None and hybrid_merger is not None
 
         # 통계
         self._stats = {
@@ -102,7 +107,7 @@ class ChromaRetriever:
 
         logger.info(
             f"ChromaRetriever 초기화: collection={collection_name}, "
-            f"top_k={top_k} (Dense 전용, 하이브리드 미지원)"
+            f"top_k={top_k}, hybrid={'활성' if self._hybrid_enabled else '비활성'}"
         )
 
     async def search(
@@ -149,14 +154,26 @@ class ChromaRetriever:
             )
 
             # 3. SearchResult로 변환
-            results = self._convert_to_search_results(raw_results)
+            dense_results = self._convert_to_search_results(raw_results)
+
+            # Phase 1: 하이브리드 검색 (BM25 엔진이 주입된 경우)
+            if self._hybrid_enabled:
+                bm25_results = self._bm25_index.search(query, top_k=top_k)
+                results = self._hybrid_merger.merge(
+                    dense_results=dense_results,
+                    bm25_results=bm25_results,
+                    top_k=top_k,
+                )
+            else:
+                results = dense_results
 
             # 4. 통계 업데이트
             self._stats["total_searches"] += 1
 
             logger.info(
                 f"ChromaRetriever 검색 완료: "
-                f"{len(results)}개 결과 반환 (query='{query[:30]}...')"
+                f"{len(results)}개 결과 반환 "
+                f"(query='{query[:30]}...', hybrid={self._hybrid_enabled})"
             )
 
             return results
