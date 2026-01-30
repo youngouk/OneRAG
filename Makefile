@@ -59,7 +59,7 @@ help:
 	@echo "  quickstart-local      - Docker 없이 원클릭 실행 (ChromaDB + BM25)"
 	@echo "  quickstart-local-load - ChromaDB 샘플 데이터 로드"
 	@echo "  quickstart-local-chat - CLI 챗봇 실행"
-	@echo "  quickstart-local-clean- 로컬 퀵스타트 데이터 삭제"
+	@echo "  quickstart-local-clean - 로컬 퀵스타트 데이터 삭제"
 	@echo ""
 	@echo "🔗 Fullstack (Frontend + Backend + Weaviate):"
 	@echo "  fullstack       - 전체 스택 Docker Compose 실행"

@@ -10,6 +10,7 @@ Docker-Free 로컬 퀵스타트 원클릭 실행
     uv run python quickstart_local/run.py
 """
 
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -34,9 +35,7 @@ def check_dependencies() -> tuple[bool, list[str]]:
     """
     missing = []
     for pkg in REQUIRED_PACKAGES:
-        try:
-            __import__(pkg)
-        except ImportError:
+        if importlib.util.find_spec(pkg) is None:
             missing.append(pkg)
 
     return len(missing) == 0, missing
@@ -51,9 +50,7 @@ def check_optional_dependencies() -> list[str]:
     """
     missing = []
     for pkg in OPTIONAL_PACKAGES:
-        try:
-            __import__(pkg)
-        except ImportError:
+        if importlib.util.find_spec(pkg) is None:
             missing.append(pkg)
     return missing
 
@@ -154,7 +151,8 @@ def main() -> None:
     print("=" * 50)
     print()
     chat_script = project_root / "quickstart_local" / "chat.py"
-    subprocess.run([sys.executable, str(chat_script)], cwd=str(project_root))
+    result = subprocess.run([sys.executable, str(chat_script)], cwd=str(project_root))
+    sys.exit(result.returncode)
 
 
 if __name__ == "__main__":

@@ -46,11 +46,18 @@ def prepare_documents(raw_docs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
 
     for doc in raw_docs:
+        # 필수 필드 검증
+        doc_id = doc.get("id", "")
+        title = doc.get("title", "")
+        content = doc.get("content", "")
+        if not doc_id or not content:
+            continue
+
         # title + content 병합 (검색 최적화)
-        full_content = f"{doc['title']}\n\n{doc['content']}"
+        full_content = f"{title}\n\n{content}" if title else content
 
         metadata: dict[str, Any] = {
-            "source_file": doc["title"],
+            "source_file": title,
             "file_type": doc.get("metadata", {}).get("category", "FAQ"),
             "source": "quickstart_sample",
         }
@@ -61,7 +68,7 @@ def prepare_documents(raw_docs: list[dict[str, Any]]) -> list[dict[str, Any]]:
             metadata["category"] = category
 
         result.append({
-            "id": doc["id"],
+            "id": doc_id,
             "content": full_content,
             "metadata": metadata,
         })

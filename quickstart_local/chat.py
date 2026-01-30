@@ -79,31 +79,35 @@ def build_user_prompt(query: str, documents: list[dict[str, Any]]) -> str:
 
 async def generate_answer(query: str, documents: list[dict[str, Any]]) -> str | None:
     """
-    Google Gemini API로 RAG 답변 생성
+    Google Gemini API로 RAG 답변 생성 (비동기)
 
     Args:
         query: 사용자 질문
         documents: 검색된 문서 리스트
 
     Returns:
-        LLM 답변 문자열. API 키 미설정 시 None 반환.
+        LLM 답변 문자열. API 키 미설정 또는 openai 미설치 시 None 반환.
+        에러 발생 시 사용자 친화적 에러 메시지 문자열 반환.
     """
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         return None
 
     try:
-        from openai import OpenAI
+        from openai import AsyncOpenAI
+    except ImportError:
+        return None
 
-        client = OpenAI(
-            base_url=GEMINI_API_URL,
-            api_key=api_key,
-            timeout=60,
-        )
+    client = AsyncOpenAI(
+        base_url=GEMINI_API_URL,
+        api_key=api_key,
+        timeout=60,
+    )
 
+    try:
         user_prompt = build_user_prompt(query, documents)
 
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=GEMINI_MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -115,10 +119,45 @@ async def generate_answer(query: str, documents: list[dict[str, Any]]) -> str | 
 
         return response.choices[0].message.content
 
-    except ImportError:
-        return None
     except Exception as e:
-        return f"[답변 생성 오류] {e}"
+        return _format_llm_error(e)
+    finally:
+        await client.close()
+
+
+def _format_llm_error(error: Exception) -> str:
+    """
+    LLM API 에러를 사용자 친화적 메시지로 변환
+
+    Args:
+        error: 발생한 예외
+
+    Returns:
+        사용자에게 보여줄 에러 메시지
+    """
+    error_str = str(error)
+
+    # API 할당량 초과 (429)
+    if "429" in error_str or "quota" in error_str.lower():
+        return (
+            "API 호출 한도를 초과했습니다.\n"
+            "해결: 잠시 후 다시 시도하거나, "
+            "https://aistudio.google.com/apikey 에서 새 키를 발급받으세요."
+        )
+
+    # 인증 실패 (401/403)
+    if "401" in error_str or "403" in error_str or "auth" in error_str.lower():
+        return (
+            "API 키 인증에 실패했습니다.\n"
+            "해결: GOOGLE_API_KEY 환경변수가 올바른지 확인하세요."
+        )
+
+    # 타임아웃
+    if "timeout" in error_str.lower() or "timed out" in error_str.lower():
+        return "API 응답 시간이 초과되었습니다.\n해결: 잠시 후 다시 시도하세요."
+
+    # 기타 에러
+    return f"답변 생성 중 오류가 발생했습니다: {type(error).__name__}"
 
 
 async def search_documents(
@@ -149,10 +188,10 @@ async def search_documents(
     results = []
     for sr in search_results:
         results.append({
-            "content": sr.content,
-            "score": sr.score,
-            "source": sr.id,
-            "metadata": sr.metadata,
+            "content": getattr(sr, "content", ""),
+            "score": getattr(sr, "score", 0.0),
+            "source": getattr(sr, "id", ""),
+            "metadata": getattr(sr, "metadata", {}),
         })
 
     return results
